@@ -75,7 +75,7 @@ ga_domain: wenfenhui.github.io
 # Sidebar settings
 sidebar: true # whether or not using Sidebar.
 sidebar-about-description: "记录学习与成长"
-sidebar-avatar: https://github.com/wenfenhui.png
+sidebar-avatar: /img/avatar.jpg
 
 # Featured Tags
 featured-tags: true # whether or not using Feature-Tags
